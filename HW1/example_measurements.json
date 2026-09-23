@@ -1,0 +1,24 @@
+{
+  "calibration_file": "camera_calibration.json",
+  "world_units": "inches",
+  "closed_polygon": true,
+  "comment": "Placeholder values. reference_image_uv and object_image_uv are DISTORTED pixels from the original photo (keep them within ~3000 px of the image center, where the lens model is valid). reference_world_xy is in the unit of the reference (inches here).",
+  "reference_world_xy": [
+    [0, 0],
+    [10, 0],
+    [10, 7],
+    [0, 7]
+  ],
+  "reference_image_uv": [
+    [2150.0, 1700.0],
+    [3480.0, 1660.0],
+    [3530.0, 2610.0],
+    [2120.0, 2640.0]
+  ],
+  "object_image_uv": [
+    [2400.0, 1900.0],
+    [3200.0, 1880.0],
+    [3220.0, 2400.0],
+    [2390.0, 2420.0]
+  ]
+}

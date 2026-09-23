@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Module 2 · Calibration, measurement and two-camera geometry</h1>
+<p class="lead">
+  Work through the steps in order. Step 1 calibrates the phone camera; Step 2 turns clicked
+  pixels into real-world lengths with the perspective projection equations; Step 3 validates
+  20 measurements taken from more than 2 m and reports error statistics; the theory page
+  derives how one point appears in two cameras.
+</p>
+
+<div class="grid grid-3">
+  <a class="card step-card" href="/module2/calibration">
+    <span class="num">Step 1</span>
+    <h2>Camera calibration</h2>
+    <p>Upload 20+ checkerboard photos from the phone. OpenCV estimates the focal lengths, principal point and lens distortion.</p>
+    <p class="small" id="status-calib" style="margin-top:0.6rem"></p>
+  </a>
+  <a class="card step-card" href="/module2/measure">
+    <span class="num">Step 2</span>
+    <h2>2D measurement</h2>
+    <p>Undistort clicked pixels and map them to the object plane with a homography (or the pinhole equations at a known distance).</p>
+  </a>
+  <a class="card step-card" href="/module2/validation">
+    <span class="num">Step 3</span>
+    <h2>Validation (20 measurements)</h2>
+    <p>Compare measured lengths with tape-measured ground truth at &gt; 2 m and report MAE, RMSE, bias and confidence intervals.</p>
+    <p class="small" id="status-rows" style="margin-top:0.6rem"></p>
+  </a>
+  <a class="card step-card" href="/module2/theory">
+    <span class="num">Theory</span>
+    <h2>Point P seen by two cameras</h2>
+    <p>Derivation of the image-to-image relationship for a static camera and an oblique second camera, with an interactive check.</p>
+  </a>
+  <a class="card step-card" href="/module2/report">
+    <span class="num">Report</span>
+    <h2>Printable report</h2>
+    <p>Calibration results, validation table and statistics, and the derivation, ready to save as PDF.</p>
+  </a>
+</div>
+
+<div class="card">
+  <h2>Source code</h2>
+  <p>
+    Command-line scripts (Python and MATLAB) live in
+    <a href="https://github.com/Tmaku18/Computer_Vision/tree/main/HW1" target="_blank" rel="noopener"><code>HW1/</code></a>;
+    this site calls the same <code>cv_core.py</code> module. Each script starts with a README block explaining how to run it.
+  </p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module">
+  import { $, fmt, getActiveCalibration, store } from "/static/js/api.js";
+  getActiveCalibration().then((c) => {
+    $("#status-calib").innerHTML =
+      `<span class="badge ok">Ready</span> ${c.label} · ${fmt(c.calibration.rms_px, 2)} px RMS`;
+  });
+  const n = store.rows.length;
+  $("#status-rows").innerHTML =
+    `<span class="badge ${n >= 20 ? "ok" : "warn"}">${n} / 20</span> measurements recorded in this browser`;
+</script>
+{% endblock %}

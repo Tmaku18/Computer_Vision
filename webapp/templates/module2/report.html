@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+{% endblock %}
+{% block content %}
+<div class="card no-print stack">
+  <h2>Report settings</h2>
+  <div class="fields">
+    <div class="field" style="flex:2"><label for="repo-url">GitHub repository</label><input type="url" id="repo-url"></div>
+    <div class="field" style="flex:2"><label for="app-url">Web application</label><input type="url" id="app-url"></div>
+    <div class="field"><label for="video-url">Video (optional)</label><input type="url" id="video-url"></div>
+  </div>
+  <div class="row">
+    <button type="button" id="btn-print">Print / Save as PDF</button>
+    <span class="hint">Data comes from the active calibration and the Step 3 rows stored in this browser.</span>
+  </div>
+</div>
+
+<article id="report">
+  <div class="card">
+    <h1>CSc 8830 Computer Vision · Module 2 Assignment</h1>
+    <p><strong>Tanaka Makuvaza</strong> · <span id="r-date"></span></p>
+    <dl class="kv">
+      <dt>GitHub repository</dt><dd><a id="r-repo"></a></dd>
+      <dt>Web application</dt><dd><a id="r-app"></a></dd>
+      <dt id="r-video-dt">Demonstration video</dt><dd><a id="r-video"></a></dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <h2>Step 1 · Camera calibration</h2>
+    <p>
+      A smartphone camera was calibrated with OpenCV's built-in checkerboard tools
+      (<code>findChessboardCornersSB</code>, <code>cornerSubPix</code>, <code>calibrateCamera</code>) using Zhang's method.
+      The model has focal lengths, principal point and two radial distortion coefficients, with tangential distortion and \(k_3\) fixed at zero
+      (the same model as MATLAB's default).
+    </p>
+    <dl class="kv" id="r-calib"></dl>
+    <div style="margin-top:0.75rem"><label>Camera matrix \(K\) (pixels)</label><div class="matrix" id="r-k"></div></div>
+    <canvas id="r-chart-views" height="80" style="margin-top:0.75rem"></canvas>
+  </div>
+
+  <div class="card">
+    <h2>Step 2 · Real-world 2D dimensions from perspective projection</h2>
+    <p>Pixels are undistorted by inverting \(\mathbf x_d = \mathbf x\,(1 + k_1 r^2 + k_2 r^4)\) with Newton's method. Then one of two models is applied:</p>
+    <ul>
+      <li><strong>Homography (reference plane).</strong> For points on the object plane \(Z = 0\),
+        \(\lambda\,[u, v, 1]^\top = K[\,r_1\; r_2\; t\,][X, Y, 1]^\top = H[X, Y, 1]^\top\).
+        \(H\) is estimated with the normalized DLT from a checkerboard (54 corners) or a known rectangle (4 corners) on that plane, and
+        \([X, Y, 1]^\top \simeq H^{-1}[u, v, 1]^\top\). Lengths are Euclidean distances between the mapped points.</li>
+      <li><strong>Pinhole at known distance.</strong> For a plane perpendicular to the optical axis at taped distance \(Z\),
+        \(X = Z(u - c_x)/f_x,\ Y = Z(v - c_y)/f_y\).</li>
+    </ul>
+    <p>Implementation: <code>HW1/cv_core.py</code> (shared by the command-line scripts and this web application).</p>
+  </div>
+
+  <div class="card">
+    <h2>Step 3 · Validation</h2>
+    <p id="r-setup"></p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>#</th><th>Description</th><th class="num">Truth</th><th class="num">Homography</th><th class="num">Error</th><th class="num">Pinhole</th><th class="num">Error</th></tr></thead>
+      <tbody id="r-rows"></tbody>
+    </table></div>
+    <h3>Error statistics</h3>
+    <div id="r-stats"></div>
+    <div class="grid grid-2" style="margin-top:1rem">
+      <div><canvas id="r-chart-scatter" height="260"></canvas></div>
+      <div><canvas id="r-chart-errors" height="260"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Theory · Relationship between the two cameras' image coordinates</h2>
+    {% include "module2/_theory_content.html" %}
+  </div>
+</article>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="/static/js/report.js"></script>
+{% endblock %}

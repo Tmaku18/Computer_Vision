@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+{% endblock %}
+{% block content %}
+<h1>Step 3 · Validation: 20 measurements from more than 2 m</h1>
+<p class="lead">
+  For each measurement click the two ends of a segment whose true length you measured with a tape,
+  type that length, and add it. Rows are saved in this browser, can span several photos, and are
+  exported as CSV for the report and for <code>HW1/validate_measurements.py</code>.
+</p>
+
+<details class="card">
+  <summary>Experiment protocol</summary>
+  <ol>
+    <li>Tape the printed checkerboard flat on a wall (the reference plane). Measure one square with a ruler.</li>
+    <li>Tape or lean the objects flat against the same wall: boxes, books, sheets, tape strips of different lengths. Anything that sticks out from the wall adds error.</li>
+    <li>Put the phone on a tripod or a fixed surface, pointing at the wall, and tape-measure the camera-to-wall distance: more than 2 m (e.g. 2.5 m). Record it below under “Camera distance”.</li>
+    <li>Use the same zoom (1×), landscape orientation and camera as in Step 1. Keep objects inside the yellow circle (valid lens region).</li>
+    <li>Measure 20 different segments (widths, heights, diagonals) with a tape measure and write them down before or after taking 1–3 photos.</li>
+    <li>Here: upload a photo, detect the checkerboard, then add each segment with its tape length.</li>
+  </ol>
+</details>
+
+<div class="workspace">
+  <div>
+    <div class="canvas-wrap" id="canvas-wrap">
+      <div class="placeholder">Upload a validation photo. Scroll to zoom, drag to pan, click the two ends of a segment.</div>
+    </div>
+    <div class="canvas-toolbar">
+      <span><span class="legend-dot" style="background:#ff5a5f"></span>segment</span>
+      <span><span class="legend-dot" style="background:#22c55e"></span>reference</span>
+      <span><span class="legend-dot" style="background:#ffc400"></span>valid lens region</span>
+      <div class="spacer"></div>
+      <button type="button" class="ghost" id="btn-clear">Clear segment</button>
+      <button type="button" class="ghost" id="btn-fit">Fit view</button>
+    </div>
+
+    <div class="card stack" style="margin-top:1rem">
+      <h2>Add measurement</h2>
+      <div class="fields">
+        <div class="field"><label for="gt-value">Ground truth (tape)</label><input type="number" id="gt-value" step="any" min="0"></div>
+        <div class="field" style="flex:3"><label for="gt-desc">Description</label><input type="text" id="gt-desc" placeholder="e.g. cereal box width"></div>
+      </div>
+      <div class="row">
+        <span class="small" id="live-estimate">Segment: —</span>
+        <div class="spacer"></div>
+        <button type="button" id="btn-add" disabled>Add measurement</button>
+      </div>
+      <div id="add-msg" class="msg"></div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <h2 style="margin:0">Measurements</h2>
+        <div class="spacer"></div>
+        <span class="small" id="progress-text"></span>
+      </div>
+      <div class="progress" style="margin:0.6rem 0"><div id="progress-bar"></div></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>#</th><th>Description</th><th>Photo</th><th class="num">Truth</th>
+            <th class="num">Homography</th><th class="num">Error</th>
+            <th class="num">Pinhole</th><th class="num">Error</th><th></th>
+          </tr></thead>
+          <tbody id="rows-body"></tbody>
+        </table>
+      </div>
+      <div class="row" style="margin-top:0.75rem">
+        <button type="button" class="secondary" id="btn-export-csv">Export CSV</button>
+        <button type="button" class="secondary" id="btn-export-json">Export JSON</button>
+        <label class="button secondary" style="margin:0">Import<input type="file" id="import-file" accept=".csv,.json" hidden></label>
+        <div class="spacer"></div>
+        <button type="button" class="danger" id="btn-clear-rows">Delete all</button>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    {% include "module2/_workspace_controls.html" %}
+  </div>
+</div>
+
+<div class="card">
+  <h2>Error statistics</h2>
+  <div class="grid grid-2">
+    <div><h3>Homography (reference plane)</h3><div id="stats-homography"></div></div>
+    <div><h3>Pinhole (known distance)</h3><div id="stats-pinhole"></div></div>
+  </div>
+</div>
+
+<div class="grid grid-2">
+  <div class="card"><h2>Estimated vs. true length</h2><canvas id="chart-scatter" height="260"></canvas></div>
+  <div class="card"><h2>Signed error per measurement</h2><canvas id="chart-errors" height="260"></canvas></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="/static/js/validation.js"></script>
+{% endblock %}

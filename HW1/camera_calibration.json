@@ -1,0 +1,39 @@
+{
+  "camera_matrix": [
+    [
+      3729.942043002174,
+      0.0,
+      2861.8935536589843
+    ],
+    [
+      0.0,
+      3729.7818924978237,
+      2112.2485113245925
+    ],
+    [
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "dist_coeffs": [
+    0.10598724893778035,
+    -0.28750942421558473,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "image_size": [
+    4284,
+    5712
+  ],
+  "rms_px": 2.41433018383661,
+  "num_images": 29,
+  "checkerboard_inner_corners": [
+    9,
+    6
+  ],
+  "square_size": 1.0,
+  "world_units": "inches",
+  "source": "OpenCV calibrateCamera (fx, fy, cx, cy, k1, k2)"
+}

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }} · CSc 8830 Computer Vision</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='3' fill='%232952cc'/><circle cx='8' cy='8' r='3.5' fill='white'/></svg>">
+  <link rel="stylesheet" href="/static/css/app.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '\\[', right: '\\]', display: true}, {left: '\\(', right: '\\)', display: false}], throwOnError: false})"></script>
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <header class="site-header">
+    <div class="inner">
+      <a class="brand" href="/">CSc 8830 Computer Vision<small>Tanaka Makuvaza</small></a>
+      <nav class="nav">
+        {% set links = [
+          ("/", "Home"),
+          ("/module2", "Module 2"),
+          ("/module2/calibration", "1 · Calibrate"),
+          ("/module2/measure", "2 · Measure"),
+          ("/module2/validation", "3 · Validate"),
+          ("/module2/theory", "Theory"),
+          ("/module2/report", "Report"),
+        ] %}
+        {% for href, text in links %}
+        <a href="{{ href }}" class="{{ 'active' if path == href else '' }}">{{ text }}</a>
+        {% endfor %}
+      </nav>
+      {% if path.startswith("/module2") %}
+      <div class="calib-pill">Calibration: <a href="/module2/calibration" id="active-calib-label">…</a></div>
+      {% endif %}
+    </div>
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+  <script type="module">
+    import { initHeader } from "/static/js/api.js";
+    initHeader();
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,18 @@
+# Python
+.venv/
+**/.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# macOS
+.DS_Store
+
+# Raw smartphone photos are large (~100 MB); the calibration result is in HW1/camera_calibration.json.
+HW1/calibration_images/*
+!HW1/calibration_images/README.txt
+HW1/validation_images/*
+!HW1/validation_images/README.txt
+
+# Web app runtime data (uploads, user calibrations)
+data/

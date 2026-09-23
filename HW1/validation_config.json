@@ -1,0 +1,11 @@
+{
+  "comment": "Step 3 (command-line path). Replace image_path with your >2 m validation photo. The web app does not need this file.",
+  "image_path": "HW1/validation_images/validation_01.jpg",
+  "camera_distance_m": 2.5,
+  "unit": "in",
+  "reference": {
+    "type": "checkerboard",
+    "pattern": [9, 6],
+    "square_size": 1.0
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "checkerboard_inner_corners": [9, 6],
+  "square_size": 1.0,
+  "square_size_units": "inches",
+  "min_calibration_images": 20,
+  "image_glob": ["*.jpg", "*.jpeg", "*.png", "*.JPG", "*.JPEG", "*.PNG"]
+}

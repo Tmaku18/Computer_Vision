@@ -1,0 +1,123 @@
+{% raw %}
+<div class="theory">
+<h3>Problem</h3>
+<p>
+  A point \(P = (X, Y, Z)\) is visible to camera 1, which is static, and to camera 2, which sits at some
+  distance from camera 1 and is turned to an oblique orientation. We want the relationship between its image
+  coordinates \(\mathbf u_1 = (u_1, v_1)\) in camera 1 and \(\mathbf u_2 = (u_2, v_2)\) in camera 2.
+  Homogeneous pixels are written \(\tilde{\mathbf u} = [u, v, 1]^\top\), and \(\simeq\) means equal up to a nonzero scale.
+</p>
+
+<h3>Assumptions and why they are reasonable</h3>
+<ol>
+  <li><strong>Pinhole cameras after lens-distortion removal.</strong> Each pixel is undistorted with the calibrated
+    \((k_1, k_2)\) first (Step 1), after which a linear pinhole model fits the photos to about 2 px RMS.</li>
+  <li><strong>The world frame is camera 1's frame.</strong> Camera 1 never moves, so its frame is a fixed reference:
+    \(R_1 = I,\ \mathbf t_1 = \mathbf 0\). This loses no generality; any other world frame only adds one known rigid transform.</li>
+  <li><strong>Rigid, fixed cameras and a static scene</strong> (or synchronized capture). The relative pose \((R, \mathbf t)\) is then constant.</li>
+  <li><strong>Known intrinsics</strong> \(K_1, K_2\) with zero skew, which holds for modern phone sensors. If the same phone is used twice, \(K_1 = K_2\).</li>
+  <li><strong>\(P\) is in front of both cameras</strong> (\(Z_1 > 0,\ Z_2 > 0\)), <strong>the baseline is nonzero</strong> (\(\mathbf t \ne \mathbf 0\)), and \(P\) is not on the baseline.
+    These conditions are needed to recover depth.</li>
+</ol>
+
+<h3>Static parameters, variables, and how to obtain them</h3>
+<div class="table-wrap"><table>
+  <thead><tr><th>Symbol</th><th>Meaning</th><th>Type</th><th>How it is determined</th></tr></thead>
+  <tbody>
+    <tr><td>\(K_i = \begin{bmatrix} f_{x} & 0 & c_{x} \\ 0 & f_{y} & c_{y} \\ 0 & 0 & 1 \end{bmatrix}\)</td><td>Intrinsics of camera \(i\): focal lengths and principal point (px)</td><td>static</td><td>Checkerboard calibration of each camera (Step 1, <code>cv2.calibrateCamera</code>)</td></tr>
+    <tr><td>\(k_1, k_2\)</td><td>Radial distortion of each camera</td><td>static</td><td>Same calibration; used to undistort pixels before applying the linear model</td></tr>
+    <tr><td>\(R\) (3 DOF)</td><td>Rotation from camera-1 axes to camera-2 axes (the oblique orientation)</td><td>static</td><td>Stereo calibration: both cameras see one checkerboard, <code>solvePnP</code> gives \((R_{1b}, \mathbf t_{1b})\) and \((R_{2b}, \mathbf t_{2b})\), then \(R = R_{2b} R_{1b}^\top\). <code>cv2.stereoCalibrate</code> does this over many views. Alternatively decompose the essential matrix (<code>findEssentialMat</code> + <code>recoverPose</code>).</td></tr>
+    <tr><td>\(\mathbf t\) (3 DOF)</td><td>Translation of camera-1 origin in camera-2 frame. Camera 2's center is \(\mathbf C_2 = -R^\top \mathbf t\) and the baseline is \(B = \lVert \mathbf t \rVert\)</td><td>static</td><td>Same stereo calibration: \(\mathbf t = \mathbf t_{2b} - R\,\mathbf t_{1b}\). From \(E\) it is known only up to scale, fixed by a tape-measured baseline \(B\).</td></tr>
+    <tr><td>\(H_\infty = K_2 R K_1^{-1}\), \(\ \tilde{\mathbf e}_2 = K_2 \mathbf t\)</td><td>Infinite homography and epipole in image 2</td><td>static (derived)</td><td>Computed from \(K_1, K_2, R, \mathbf t\)</td></tr>
+    <tr><td>\(E = [\mathbf t]_\times R\), \(\ F = K_2^{-\top} E K_1^{-1}\)</td><td>Essential and fundamental matrices</td><td>static (derived)</td><td>Computed, or estimated directly from \(\ge 8\) (F) / \(\ge 5\) (E) point matches</td></tr>
+    <tr><td>\(P = (X, Y, Z)\)</td><td>3D point in camera-1 frame</td><td>variable</td><td>Unknown; recovered by triangulation</td></tr>
+    <tr><td>\(\mathbf u_1, \mathbf u_2\)</td><td>Pixel coordinates of \(P\) in each image</td><td>variable</td><td>Measured (feature detection or clicking), then undistorted</td></tr>
+    <tr><td>\(\lambda_1 = Z,\ \lambda_2 = Z_2\)</td><td>Depth of \(P\) along each optical axis</td><td>variable</td><td>Unknown; \(\lambda_1\) from triangulation, then \(\lambda_2 = \mathbf r_3^\top P + t_z\)</td></tr>
+  </tbody>
+</table></div>
+
+<p>
+  <strong>Parameterizing the oblique pose.</strong> Place camera 2's center at \(\mathbf C_2\) (in camera-1 coordinates) and turn it
+  by yaw \(\theta\) about the vertical axis and pitch \(\varphi\) about the horizontal axis. Camera 2's axes, expressed in camera-1 coordinates,
+  are the columns of \(R_c = R_y(\theta)\,R_x(\varphi)\). A point then transforms as \(P_2 = R_c^\top (P - \mathbf C_2)\), so
+  \[ R = R_c^\top, \qquad \mathbf t = -R\,\mathbf C_2 . \]
+</p>
+
+<h3>Derivation</h3>
+<p><strong>Camera 1.</strong> Using \(K_1 [\,I \mid \mathbf 0\,]\):</p>
+<div class="math-block">\[
+  \lambda_1 \tilde{\mathbf u}_1 = K_1 P
+  \quad\Longleftrightarrow\quad
+  u_1 = f_{x1}\frac{X}{Z} + c_{x1},\qquad v_1 = f_{y1}\frac{Y}{Z} + c_{y1},\qquad \lambda_1 = Z .
+  \tag{1}\]</div>
+<p>Inverting (1), the point lies on the back-projected ray of \(\mathbf u_1\):
+  \(P = Z\,\mathbf x_1\) with normalized coordinates \(\mathbf x_1 = K_1^{-1}\tilde{\mathbf u}_1\).</p>
+
+<p><strong>Camera 2.</strong> A rigid motion followed by projection:</p>
+<div class="math-block">\[
+  P_2 = R\,P + \mathbf t, \qquad \lambda_2 \tilde{\mathbf u}_2 = K_2 (R\,P + \mathbf t). \tag{2}\]</div>
+
+<p><strong>Image 1 to image 2.</strong> Substituting \(P = Z K_1^{-1}\tilde{\mathbf u}_1\) into (2):</p>
+<div class="math-block">\[
+  \boxed{\;\lambda_2\,\tilde{\mathbf u}_2 \;=\; Z\,K_2 R K_1^{-1}\,\tilde{\mathbf u}_1 \;+\; K_2\,\mathbf t
+  \;=\; Z\,H_\infty \tilde{\mathbf u}_1 + \tilde{\mathbf e}_2\;} \tag{3}\]</div>
+<p>In coordinates, with \(\mathbf h_j^\top\) the rows of \(H_\infty\) and \(\tilde{\mathbf e}_2 = (e_x, e_y, e_z)\):</p>
+<div class="math-block">\[
+  u_2 = \frac{Z\,\mathbf h_1^\top\tilde{\mathbf u}_1 + e_x}{Z\,\mathbf h_3^\top\tilde{\mathbf u}_1 + e_z},\qquad
+  v_2 = \frac{Z\,\mathbf h_2^\top\tilde{\mathbf u}_1 + e_y}{Z\,\mathbf h_3^\top\tilde{\mathbf u}_1 + e_z},\qquad
+  \lambda_2 = Z\,\mathbf h_3^\top\tilde{\mathbf u}_1 + e_z . \tag{4}\]</div>
+<p>
+  So the camera-2 pixel is fixed by the camera-1 pixel plus one unknown scalar, the depth \(Z\). As \(Z\) runs from 0 to \(\infty\),
+  \(\mathbf u_2\) moves along a straight line from the epipole \(\mathbf e_2\) (\(Z \to 0\)) to the vanishing point
+  \(H_\infty\tilde{\mathbf u}_1\) (\(Z \to \infty\)). That line is the epipolar line. The obliquity of camera 2 enters only through
+  \(R\), which rotates and skews the line through \(H_\infty\). The baseline enters through \(\tilde{\mathbf e}_2 = K_2\mathbf t\).
+</p>
+
+<p><strong>Removing the depth: epipolar constraint.</strong> Write (3) in normalized coordinates,
+  \(\lambda_2\mathbf x_2 = Z\,R\mathbf x_1 + \mathbf t\), with \(\mathbf x_2 = K_2^{-1}\tilde{\mathbf u}_2\).
+  Take the cross product with \(\mathbf t\), which removes the \(\mathbf t\) term, then the dot product with \(\mathbf x_2\), which removes the left side:</p>
+<div class="math-block">\[
+  \mathbf x_2^\top [\mathbf t]_\times R\,\mathbf x_1 = 0
+  \;\;\Longrightarrow\;\;
+  \tilde{\mathbf u}_2^\top F\,\tilde{\mathbf u}_1 = 0,\qquad
+  E = [\mathbf t]_\times R,\quad F = K_2^{-\top} E\, K_1^{-1},\quad
+  [\mathbf t]_\times = \begin{bmatrix} 0 & -t_z & t_y \\ t_z & 0 & -t_x \\ -t_y & t_x & 0 \end{bmatrix}. \tag{5}\]</div>
+<p>The epipolar line in image 2 is \(\mathbf l_2 = F\tilde{\mathbf u}_1\), and \(\mathbf u_2\) must lie on it.</p>
+
+<p><strong>Recovering P (triangulation).</strong> With both pixels measured, (3) gives three equations for the two unknown depths:</p>
+<div class="math-block">\[
+  \begin{bmatrix} R\,\mathbf x_1 & -\mathbf x_2 \end{bmatrix}
+  \begin{bmatrix} Z \\ \lambda_2 \end{bmatrix} = -\mathbf t
+  \;\;\Rightarrow\;\;
+  \begin{bmatrix} Z \\ \lambda_2 \end{bmatrix} = -(A^\top A)^{-1}A^\top \mathbf t,\qquad P = Z\,\mathbf x_1 . \tag{6}\]</div>
+<p>With noisy pixels the two rays do not meet exactly, and (6) is the least-squares solution. <code>cv2.triangulatePoints</code> uses the equivalent linear (DLT) form.
+  The system is singular when \(\mathbf t = \mathbf 0\) or when \(P\) lies on the baseline, which is why assumption 5 is needed.</p>
+
+<h3>Special cases</h3>
+<ul>
+  <li><strong>Pure rotation</strong> (\(\mathbf t = \mathbf 0\)): \(\tilde{\mathbf u}_2 \simeq H_\infty\tilde{\mathbf u}_1\). The mapping is a homography independent of depth, so depth cannot be recovered.</li>
+  <li><strong>Points on a plane</strong> \(\mathbf n^\top P = d\): then \(Z = d / (\mathbf n^\top\mathbf x_1)\) and
+    \(\tilde{\mathbf u}_2 \simeq K_2\!\left(R + \mathbf t\,\mathbf n^\top / d\right)\! K_1^{-1}\tilde{\mathbf u}_1\), the plane-induced homography.
+    The same idea is used in Step 2, where the "second view" is the flat object plane itself.</li>
+  <li><strong>Parallel stereo</strong> (\(R = I,\ \mathbf t = (-B, 0, 0),\ K_1 = K_2\)): (4) reduces to \(v_2 = v_1\), \(u_2 = u_1 - f_x B / Z\), the familiar disparity–depth relation.</li>
+</ul>
+
+<h3>Worked example (numbers from this project's calibration)</h3>
+<p>
+  Both cameras use the Step 1 intrinsics: \(f_x = 3729.9,\ f_y = 3729.8,\ c_x = 2861.9,\ c_y = 2112.2\) px.
+  Camera 2 sits \(B = 1\) m to the right, \(\mathbf C_2 = (1, 0, 0)\) m, and is turned \(\theta = -20^\circ\) (yaw) toward the scene.
+  Take \(P = (0.30, -0.20, 3.00)\) m.
+</p>
+<ol>
+  <li>Camera 1, from (1): \(\mathbf u_1 = (3234.89,\ 1863.60)\) px and \(\lambda_1 = 3.000\) m.</li>
+  <li>Pose: \(R = R_y(-20^\circ)^\top = \begin{bmatrix} 0.9397 & 0 & 0.3420 \\ 0 & 1 & 0 \\ -0.3420 & 0 & 0.9397 \end{bmatrix}\) and
+    \(\mathbf t = -R\,\mathbf C_2 = (-0.9397,\ 0,\ 0.3420)\) m.</li>
+  <li>\(H_\infty = K R K^{-1} = \begin{bmatrix} 0.6773 & 0 & 2026.74 \\ -0.1937 & 1 & 426.92 \\ -9.17\times10^{-5} & 0 & 1.2021 \end{bmatrix}\) and
+    \(\tilde{\mathbf e}_2 = K\mathbf t = (-2526.17,\ 722.43,\ 0.3420)\), so the epipole is at \((-7386.0,\ 2112.2)\) px, off-image to the left.</li>
+  <li>Equation (4) with \(Z = 3\): \(\mathbf u_2 = (3311.02,\ 1868.35)\) px and \(\lambda_2 = 3.0585\) m.
+    Direct projection \(K(RP + \mathbf t)\) gives the same pixel, which checks (3).</li>
+  <li>\(E = [\mathbf t]_\times R = \begin{bmatrix} 0 & -0.342 & 0 \\ 0 & 0 & 1 \\ 0 & -0.9397 & 0 \end{bmatrix}\) and \(\tilde{\mathbf u}_2^\top F\,\tilde{\mathbf u}_1 = 0\) to machine precision, which checks (5).</li>
+  <li>Triangulation (6) from \(\mathbf u_1, \mathbf u_2\) returns \(Z = 3.000\) m, \(\lambda_2 = 3.0585\) m, and \(P = (0.300, -0.200, 3.000)\) m, which checks (6).</li>
+</ol>
+</div>
+{% endraw %}

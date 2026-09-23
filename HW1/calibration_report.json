@@ -1,0 +1,181 @@
+{
+  "num_images_found": 29,
+  "num_images_used": 29,
+  "overall_reproj_rms_px": 2.41433018383661,
+  "per_view_errors": [
+    {
+      "image": "IMG_5257.jpg",
+      "used": true,
+      "reproj_rms_px": 1.3586981296539307,
+      "note": ""
+    },
+    {
+      "image": "IMG_5258.jpg",
+      "used": true,
+      "reproj_rms_px": 2.8258249759674072,
+      "note": ""
+    },
+    {
+      "image": "IMG_5259.jpg",
+      "used": true,
+      "reproj_rms_px": 5.025699138641357,
+      "note": ""
+    },
+    {
+      "image": "IMG_5260.jpg",
+      "used": true,
+      "reproj_rms_px": 3.5692830085754395,
+      "note": ""
+    },
+    {
+      "image": "IMG_5261.jpg",
+      "used": true,
+      "reproj_rms_px": 2.180577278137207,
+      "note": ""
+    },
+    {
+      "image": "IMG_5262.jpg",
+      "used": true,
+      "reproj_rms_px": 1.1475857496261597,
+      "note": ""
+    },
+    {
+      "image": "IMG_5263.jpg",
+      "used": true,
+      "reproj_rms_px": 1.1640667915344238,
+      "note": ""
+    },
+    {
+      "image": "IMG_5264.jpg",
+      "used": true,
+      "reproj_rms_px": 1.9101576805114746,
+      "note": ""
+    },
+    {
+      "image": "IMG_5265.jpg",
+      "used": true,
+      "reproj_rms_px": 4.47925329208374,
+      "note": ""
+    },
+    {
+      "image": "IMG_5269.HEIC",
+      "used": true,
+      "reproj_rms_px": 2.018501043319702,
+      "note": ""
+    },
+    {
+      "image": "IMG_5270.jpg",
+      "used": true,
+      "reproj_rms_px": 2.122589111328125,
+      "note": ""
+    },
+    {
+      "image": "IMG_5271.jpg",
+      "used": true,
+      "reproj_rms_px": 1.8676878213882446,
+      "note": ""
+    },
+    {
+      "image": "IMG_5272.jpg",
+      "used": true,
+      "reproj_rms_px": 1.3091938495635986,
+      "note": ""
+    },
+    {
+      "image": "IMG_5273.jpg",
+      "used": true,
+      "reproj_rms_px": 1.0770952701568604,
+      "note": ""
+    },
+    {
+      "image": "IMG_5274.jpg",
+      "used": true,
+      "reproj_rms_px": 2.2013630867004395,
+      "note": ""
+    },
+    {
+      "image": "IMG_5275.jpg",
+      "used": true,
+      "reproj_rms_px": 1.7759374380111694,
+      "note": ""
+    },
+    {
+      "image": "IMG_5276.jpg",
+      "used": true,
+      "reproj_rms_px": 0.7118502855300903,
+      "note": ""
+    },
+    {
+      "image": "IMG_5277.jpg",
+      "used": true,
+      "reproj_rms_px": 1.1704832315444946,
+      "note": ""
+    },
+    {
+      "image": "IMG_5278.jpg",
+      "used": true,
+      "reproj_rms_px": 3.0843112468719482,
+      "note": ""
+    },
+    {
+      "image": "IMG_5279.jpg",
+      "used": true,
+      "reproj_rms_px": 2.6136646270751953,
+      "note": ""
+    },
+    {
+      "image": "IMG_5280.jpg",
+      "used": true,
+      "reproj_rms_px": 1.5832477807998657,
+      "note": ""
+    },
+    {
+      "image": "IMG_5281.jpg",
+      "used": true,
+      "reproj_rms_px": 2.342461585998535,
+      "note": ""
+    },
+    {
+      "image": "IMG_5282.jpg",
+      "used": true,
+      "reproj_rms_px": 1.729291558265686,
+      "note": ""
+    },
+    {
+      "image": "IMG_5283.jpg",
+      "used": true,
+      "reproj_rms_px": 1.8632242679595947,
+      "note": ""
+    },
+    {
+      "image": "IMG_5284.jpg",
+      "used": true,
+      "reproj_rms_px": 1.996742844581604,
+      "note": ""
+    },
+    {
+      "image": "IMG_5285.jpg",
+      "used": true,
+      "reproj_rms_px": 2.8219153881073,
+      "note": ""
+    },
+    {
+      "image": "IMG_5286.jpg",
+      "used": true,
+      "reproj_rms_px": 2.6688663959503174,
+      "note": ""
+    },
+    {
+      "image": "IMG_5287.jpg",
+      "used": true,
+      "reproj_rms_px": 2.738687515258789,
+      "note": ""
+    },
+    {
+      "image": "IMG_5288.jpg",
+      "used": true,
+      "reproj_rms_px": 2.807196855545044,
+      "note": ""
+    }
+  ]
+}

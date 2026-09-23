@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>CSc 8830 · Computer Vision</h1>
+<p class="lead">
+  Course assignments as working web demonstrations. Each module links to its
+  interactive pages and to the source code in the
+  <a href="https://github.com/Tmaku18/Computer_Vision" target="_blank" rel="noopener">GitHub repository</a>.
+</p>
+
+<div class="grid grid-2">
+  <a class="card step-card" href="/module2">
+    <span class="num">Module 2</span>
+    <h2>Camera calibration &amp; real-world measurement</h2>
+    <p>
+      Calibrate a smartphone camera, measure 2D object dimensions with perspective
+      projection, validate 20 measurements from more than 2 m, and derive the
+      two-camera image relationship.
+    </p>
+    <p class="small" style="margin-top:0.75rem">
+      <span class="badge ok">Live</span>
+      Step 1 · Step 2 · Step 3 · Theory · Report
+    </p>
+  </a>
+
+  <div class="card">
+    <h2>Other modules</h2>
+    <p class="muted">
+      New assignments are added to this page as they are completed, so every
+      module stays reachable from one place.
+    </p>
+  </div>
+</div>
+{% endblock %}

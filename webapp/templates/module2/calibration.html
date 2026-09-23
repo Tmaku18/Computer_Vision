@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+{% endblock %}
+{% block content %}
+<h1>Step 1 · Camera calibration</h1>
+<p class="lead">
+  Zhang's method with OpenCV <code>findChessboardCornersSB</code> and <code>calibrateCamera</code>.
+  Each photo gives 54 corner correspondences between the flat board (\(Z = 0\)) and the image;
+  the solver finds the intrinsics \(K\) and distortion \((k_1, k_2)\) that minimize the reprojection error.
+</p>
+
+<div class="grid grid-2">
+  <div class="card stack">
+    <h2>Active calibration</h2>
+    <div class="field">
+      <label for="calib-select">Calibration used by Steps 2 and 3</label>
+      <select id="calib-select"></select>
+    </div>
+    <dl class="kv" id="calib-summary"></dl>
+    <div>
+      <label>Camera matrix \(K\) (pixels)</label>
+      <div class="matrix" id="calib-k"></div>
+    </div>
+  </div>
+
+  <div class="card stack">
+    <h2>Run a new calibration</h2>
+    <label class="file-drop" id="cal-drop">
+      <input type="file" id="cal-files" accept="image/*,.heic,.heif" multiple>
+      <span id="cal-files-label">Drop 20 or more checkerboard photos here, or click to choose</span>
+    </label>
+    <div class="fields">
+      <div class="field"><label for="cal-cols">Inner corners (cols)</label><input type="number" id="cal-cols" value="9" min="3"></div>
+      <div class="field"><label for="cal-rows">Inner corners (rows)</label><input type="number" id="cal-rows" value="6" min="3"></div>
+      <div class="field"><label for="cal-square">Square size</label><input type="number" id="cal-square" value="1" step="any" min="0"></div>
+      <div class="field"><label for="cal-units">Unit</label><select id="cal-units"></select></div>
+    </div>
+    <div class="fields">
+      <div class="field"><label for="cal-min">Minimum photos</label><input type="number" id="cal-min" value="20" min="3"></div>
+      <div class="field" style="flex:3"><label for="cal-label">Label (optional)</label><input type="text" id="cal-label" placeholder="e.g. iPhone main camera, 1x"></div>
+    </div>
+    <div class="row">
+      <button type="button" id="btn-calibrate" disabled>Calibrate</button>
+      <div class="spacer"></div>
+    </div>
+    <div class="progress" hidden id="cal-progress"><div></div></div>
+    <div id="cal-msg" class="msg"></div>
+    <p class="hint">
+      Keep the phone in landscape for every photo, fill different parts of the frame (including the
+      corners), and vary the tilt. HEIC photos from an iPhone are accepted.
+    </p>
+  </div>
+</div>
+
+<div class="card">
+  <div class="row"><h2 style="margin:0">Per-photo reprojection error</h2><div class="spacer"></div><span class="small muted" id="views-count"></span></div>
+  <canvas id="chart-views" height="90"></canvas>
+</div>
+
+<div class="card" id="thumbs-card" hidden>
+  <h2>Detected corners</h2>
+  <div class="thumbs" id="thumbs"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="/static/js/calibration.js"></script>
+{% endblock %}

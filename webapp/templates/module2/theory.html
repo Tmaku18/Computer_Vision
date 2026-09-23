@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Theory · One point, two cameras</h1>
+<p class="lead">
+  How the image coordinates of a point \(P\) in a static camera relate to its coordinates in a second camera
+  placed some distance away at an oblique angle.
+</p>
+
+<div class="card">
+  <h2>Interactive check</h2>
+  <p class="muted small">
+    Uses the active calibration's \(K\) for both cameras. Move \(P\) or camera 2; the page evaluates equations (1)–(6)
+    and compares them with direct projection.
+  </p>
+  <div class="grid grid-2">
+    <div class="stack">
+      <h3>Point P (camera-1 frame, m)</h3>
+      <div class="fields">
+        <div class="field"><label>X</label><input type="number" id="px" value="0.30" step="0.05"></div>
+        <div class="field"><label>Y</label><input type="number" id="py" value="-0.20" step="0.05"></div>
+        <div class="field"><label>Z (depth)</label><input type="number" id="pz" value="3.00" step="0.1" min="0.1"></div>
+      </div>
+      <h3>Camera 2 pose</h3>
+      <div class="fields">
+        <div class="field"><label>Center Cx (m)</label><input type="number" id="cx2" value="1.0" step="0.1"></div>
+        <div class="field"><label>Center Cy (m)</label><input type="number" id="cy2" value="0" step="0.1"></div>
+        <div class="field"><label>Center Cz (m)</label><input type="number" id="cz2" value="0" step="0.1"></div>
+      </div>
+      <div class="fields">
+        <div class="field"><label>Yaw θ (°) <span id="yaw-v"></span></label><input type="range" id="yaw" min="-60" max="60" value="-20" step="1"></div>
+        <div class="field"><label>Pitch φ (°) <span id="pitch-v"></span></label><input type="range" id="pitch" min="-30" max="30" value="0" step="1"></div>
+      </div>
+      <dl class="kv" id="theory-out"></dl>
+    </div>
+    <div class="stack">
+      <svg id="images-svg" viewBox="0 0 640 260" style="width:100%;background:#f3f5fa;border-radius:8px"></svg>
+      <svg id="top-svg" viewBox="0 0 640 300" style="width:100%;background:#f3f5fa;border-radius:8px"></svg>
+      <p class="hint">Top: both image planes with \(P\)'s projection and, in camera 2, the epipolar line \(F\tilde{\mathbf u}_1\).
+        Bottom: top view (x–z plane) of the cameras, their optical axes, and \(P\).</p>
+    </div>
+  </div>
+  <h3>Matrices</h3>
+  <div class="grid grid-3">
+    <div><label>\(R\)</label><div class="matrix" id="m-r"></div></div>
+    <div><label>\(\mathbf t\) (m)</label><div class="matrix" id="m-t"></div></div>
+    <div><label>\(E = [\mathbf t]_\times R\)</label><div class="matrix" id="m-e"></div></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Derivation</h2>
+  {% include "module2/_theory_content.html" %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="/static/js/theory.js"></script>
+{% endblock %}

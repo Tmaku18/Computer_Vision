@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Step 2 · Real-world 2D dimensions</h1>
+<p class="lead">
+  Clicked pixels are first undistorted with the calibrated lens model. With a reference on the object's
+  plane, the perspective projection \(\lambda\,[u, v, 1]^\top = K\,[\,r_1\; r_2\; t\,]\,[X, Y, 1]^\top = H\,[X, Y, 1]^\top\)
+  is inverted to get plane coordinates \((X, Y)\). With only the camera distance \(Z\), the pinhole equations
+  \(X = Z(u - c_x)/f_x,\; Y = Z(v - c_y)/f_y\) are used instead.
+</p>
+
+<div class="workspace">
+  <div>
+    <div class="canvas-wrap" id="canvas-wrap">
+      <div class="placeholder">Upload a photo to start. Scroll to zoom, drag to pan, click to place points.</div>
+    </div>
+    <div class="canvas-toolbar">
+      <span><span class="legend-dot" style="background:#ff5a5f"></span>object</span>
+      <span><span class="legend-dot" style="background:#22c55e"></span>reference</span>
+      <span><span class="legend-dot" style="background:#ffc400"></span>valid lens region</span>
+      <div class="spacer"></div>
+      <label class="row" style="margin:0"><input type="checkbox" id="closed" checked> closed shape</label>
+      <button type="button" class="ghost" id="btn-undo">Undo point</button>
+      <button type="button" class="ghost" id="btn-clear">Clear object</button>
+      <button type="button" class="ghost" id="btn-fit">Fit view</button>
+    </div>
+
+    <div class="card" style="margin-top:1rem">
+      <h2>Measurements</h2>
+      <div id="results"><p class="muted">Place at least 2 object points (4 corners for a rectangle).</p></div>
+    </div>
+  </div>
+
+  <div>
+    {% include "module2/_workspace_controls.html" %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="/static/js/measure.js"></script>
+{% endblock %}

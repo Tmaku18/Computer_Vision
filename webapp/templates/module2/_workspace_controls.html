@@ -1,0 +1,61 @@
+<div class="card stack">
+  <h2>1 · Photo</h2>
+  <label class="file-drop" id="photo-drop">
+    <input type="file" id="photo-input" accept="image/*,.heic,.heif">
+    <span id="photo-name">Drop a photo here or click to choose (JPEG, PNG or iPhone HEIC)</span>
+  </label>
+  <p class="hint">Use the same phone and orientation (landscape) as the calibration photos.</p>
+</div>
+
+<div class="card stack">
+  <h2>2 · Reference plane</h2>
+  <div class="tabs" role="tablist">
+    <button type="button" class="active" data-tab="ref-board">Checkerboard in photo</button>
+    <button type="button" data-tab="ref-rect">Known rectangle</button>
+  </div>
+
+  <div class="tab-panel" id="ref-board">
+    <div class="fields">
+      <div class="field"><label for="board-cols">Inner corners (cols)</label><input type="number" id="board-cols" value="9" min="3"></div>
+      <div class="field"><label for="board-rows">Inner corners (rows)</label><input type="number" id="board-rows" value="6" min="3"></div>
+      <div class="field"><label for="board-square">Square size</label><input type="number" id="board-square" value="1" step="any" min="0"></div>
+    </div>
+    <div class="row" style="margin-top:0.6rem">
+      <button type="button" id="btn-detect-board">Detect checkerboard</button>
+    </div>
+    <p class="hint">The board must lie flat on the same plane as the object (e.g. taped to the same wall).</p>
+  </div>
+
+  <div class="tab-panel" id="ref-rect" hidden>
+    <div class="fields">
+      <div class="field"><label for="rect-w">Width</label><input type="number" id="rect-w" value="11" step="any" min="0"></div>
+      <div class="field"><label for="rect-h">Height</label><input type="number" id="rect-h" value="8.5" step="any" min="0"></div>
+    </div>
+    <div class="row" style="margin-top:0.6rem">
+      <button type="button" class="secondary" id="btn-rect-start">Click 4 corners</button>
+      <button type="button" id="btn-set-rect" disabled>Use rectangle</button>
+    </div>
+    <p class="hint">Order: top-left, top-right, bottom-right, bottom-left. Default is a US Letter sheet (11 × 8.5 in).</p>
+  </div>
+
+  <div class="field">
+    <label for="ref-unit">Unit (reference, ground truth and results)</label>
+    <select id="ref-unit"></select>
+  </div>
+  <dl class="kv" id="ref-info"></dl>
+</div>
+
+<div class="card stack">
+  <h2>3 · Camera distance <span class="badge">pinhole method</span></h2>
+  <div class="fields">
+    <div class="field"><label for="dist-value">Tape-measured distance to plane</label><input type="number" id="dist-value" step="any" min="0" placeholder="e.g. 2.5"></div>
+    <div class="field" style="max-width:90px"><label for="dist-unit">Unit</label><select id="dist-unit"></select></div>
+  </div>
+  <div class="row"><button type="button" class="ghost" id="btn-dist-from-pnp" disabled>Use distance estimated from reference</button></div>
+  <p class="hint">
+    The pinhole method assumes the plane is perpendicular to the optical axis at this distance:
+    \(X = Z\,(u - c_x)/f_x\). Leave empty to use only the homography.
+  </p>
+</div>
+
+<div id="ws-msg" class="msg"></div>
