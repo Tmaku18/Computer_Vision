@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+{% endblock %}
+{% block content %}
+<div class="card no-print stack">
+  <h2>Report settings</h2>
+  <div class="fields">
+    <div class="field" style="flex:2"><label for="repo-url">GitHub repository</label><input type="url" id="repo-url" value="https://github.com/Tmaku18/Computer_Vision"></div>
+    <div class="field" style="flex:2"><label for="app-url">Web application</label><input type="url" id="app-url"></div>
+    <div class="field"><label for="video-url">Video (optional)</label><input type="url" id="video-url"></div>
+  </div>
+  <div class="row">
+    <button type="button" id="btn-print">Print / Save as PDF</button>
+    <span class="hint">In the print dialog, choose “Save as PDF”. The settings box is omitted.</span>
+  </div>
+</div>
+
+<article id="report">
+  <div class="card">
+    <h1>CSc 8830 Computer Vision · Module 3 Assignment</h1>
+    <p><strong>Tanaka Makuvaza</strong> · <span id="r-date"></span></p>
+    <dl class="kv">
+      <dt>GitHub repository</dt><dd><a id="r-repo" href="https://github.com/Tmaku18/Computer_Vision">https://github.com/Tmaku18/Computer_Vision</a></dd>
+      <dt>Web application</dt><dd><a id="r-app"></a></dd>
+      <dt>Demonstration video</dt><dd><a id="r-video"></a></dd>
+      <dt>Code</dt><dd><code>HW2/filtering_core.py</code>, <code>HW2/blur_image.py</code>, <code>HW2/verify_convolution_theorem.py</code>, <code>HW2/worked_example.py</code></dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <h2>Implementation</h2>
+    <p>
+      Blur is a convolution with a normalized kernel: box (equal weights), Gaussian, disk (defocus), or a
+      rotated line (motion). The spatial implementation is the sum in equation (1), written as an explicit
+      sum of shifted copies of the image. The frequency implementation zero-pads (linear mode) or wraps the
+      kernel center to index 0 (circular mode), multiplies FFTs, and inverse-transforms.
+      <code>cv2.filter2D</code> is used only as a cross-check, with the kernel flipped, because that function computes correlation.
+    </p>
+  </div>
+
+  <div class="card">
+    {% include "module3/_theory_content.html" %}
+    <h3>Numerical check of the worked example</h3>
+    <p id="r-example">Computing…</p>
+  </div>
+
+  <div class="card">
+    <h2>Experiment</h2>
+    <p id="r-experiment-note">
+      Each kernel is applied with the two boundary conditions the theorem predicts (zeros, and wrap-around)
+      and with reflected borders, which the theorem does not predict. Green rows in the saved figure are the
+      predicted matches. Images are scaled to about 160 px on the long side so the table is about the math,
+      not about runtime.
+    </p>
+    <p id="r-verdict"></p>
+    <div class="table-wrap"><table>
+      <thead>
+        <tr><th>Image</th><th>Kernel</th><th>Border</th><th>Should match</th><th class="num">max |error|</th><th class="num">RMSE</th><th class="num">PSNR (dB)</th></tr>
+      </thead>
+      <tbody id="r-rows"><tr><td colspan="7" class="muted">Loading the experiment…</td></tr></tbody>
+    </table></div>
+    <div class="figure-grid" style="margin-top:0.8rem">
+      <figure><img id="r-fig-diff" alt=""><figcaption>Max absolute difference. Green matches, red is the reflected border.</figcaption></figure>
+      <figure><img id="r-fig-time" alt=""><figcaption>Seconds against Gaussian size. The spatial sum grows; the FFT does not.</figcaption></figure>
+    </div>
+    <canvas id="r-chart" height="90" class="no-print" style="margin-top:0.8rem"></canvas>
+  </div>
+</article>
+{% endblock %}
+{% block scripts %}
+<script type="module" src="/static/js/report3.js"></script>
+{% endblock %}

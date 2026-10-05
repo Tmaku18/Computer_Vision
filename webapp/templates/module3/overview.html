@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Module 3 · Blurring in space and in frequency</h1>
+<p class="lead">
+  A blur slides a small kernel across the image and replaces every pixel by a weighted average of its
+  neighbors. The convolution theorem says the same picture comes out if you instead transform the image
+  and the kernel with the Fourier transform, multiply them, and transform back. This module does both
+  and checks that they agree.
+</p>
+
+<div class="grid grid-3">
+  <a class="card step-card" href="/module3/blur">
+    <span class="num">Demo</span>
+    <h2>Blur an image</h2>
+    <p>Pick a kernel, see the spatial blur beside the Fourier blur, and read off the difference. It should be about 10<sup>−12</sup>, which is rounding error.</p>
+  </a>
+  <a class="card step-card" href="/module3/theory">
+    <span class="num">Theory</span>
+    <h2>Convolution theorem</h2>
+    <p>Why multiplication in frequency is convolution in space, why the DFT wraps around, and a worked 1-D example you can edit.</p>
+  </a>
+  <a class="card step-card" href="/module3/report">
+    <span class="num">Report</span>
+    <h2>Printable report</h2>
+    <p>The experiment table, the timing comparison, the worked example, and links for the PDF submission.</p>
+  </a>
+</div>
+
+<div class="card">
+  <h2>Code</h2>
+  <p>
+    The math is in <code>HW2/filtering_core.py</code>, shared by the command-line scripts and these pages.
+    Run notes are in <code>HW2/RUN_ASSIGNMENT.md</code> and at the top of each script.
+  </p>
+  <ul>
+    <li><code>HW2/blur_image.py</code> — blur one photo both ways.</li>
+    <li><code>HW2/verify_convolution_theorem.py</code> — the full experiment (kernels × boundary conditions).</li>
+    <li><code>HW2/worked_example.py</code> — the typed 1-D derivation, every product printed.</li>
+  </ul>
+</div>
+{% endblock %}

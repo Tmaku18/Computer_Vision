@@ -127,6 +127,10 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .stat { background: #f7f8fc; border: 1px solid var(--border); border-radius: 8px; padding: 0.6rem 0.75rem; }
 .stat .v { font-size: 1.25rem; font-weight: 700; font-variant-numeric: tabular-nums; }
 .stat .l { font-size: 0.78rem; color: var(--muted); }
+.figure-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem; }
+.figure-grid figure { margin: 0; }
+.figure-grid img { width: 100%; display: block; border-radius: 8px; background: #0f1320; }
+.figure-grid figcaption { font-size: 0.8rem; color: var(--muted); margin-top: 0.3rem; }
 
 .math-block { overflow-x: auto; padding: 0.25rem 0; }
 .theory h3 { margin-top: 1.5rem; }

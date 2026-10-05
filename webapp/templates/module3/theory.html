@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Theory · convolution in space, multiplication in frequency</h1>
+<p class="lead">
+  The derivation, then a small signal you can edit. The page recomputes the spatial sum and the DFT multiply
+  and shows the gap between them.
+</p>
+
+<div class="card">
+  {% include "module3/_theory_content.html" %}
+</div>
+
+<div class="card">
+  <h2>Interactive check</h2>
+  <div class="fields">
+    <div class="field" style="flex:2"><label for="ex-signal">Signal f (comma separated)</label><input type="text" id="ex-signal" value="1, 2, 3, 4"></div>
+    <div class="field" style="flex:2"><label for="ex-kernel">Kernel h (odd length)</label><input type="text" id="ex-kernel" value="1, 2, 1"></div>
+    <div class="field" style="flex:0"><label>&nbsp;</label><button type="button" id="btn-example">Recompute</button></div>
+  </div>
+  <div id="example-out" style="margin-top:0.8rem"></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script type="module" src="/static/js/theory3.js"></script>
+{% endblock %}

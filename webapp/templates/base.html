@@ -17,20 +17,18 @@
     <div class="inner">
       <a class="brand" href="/">CSc 8830 Computer Vision<small>Tanaka Makuvaza</small></a>
       <nav class="nav">
-        {% set links = [
-          ("/", "Home"),
-          ("/module2", "Module 2"),
-          ("/module2/calibration", "1 · Calibrate"),
-          ("/module2/measure", "2 · Measure"),
-          ("/module2/validation", "3 · Validate"),
-          ("/module2/theory", "Theory"),
-          ("/module2/report", "Report"),
-        ] %}
-        {% for href, text in links %}
-        <a href="{{ href }}" class="{{ 'active' if path == href else '' }}">{{ text }}</a>
-        {% endfor %}
+        <a href="/" class="{{ 'active' if path == '/' else '' }}">Home</a>
+        {% if module %}
+          {% for href, text in module.links %}
+          <a href="{{ href }}" class="{{ 'active' if path == href else '' }}">{{ text }}</a>
+          {% endfor %}
+        {% else %}
+          {% for m in modules %}
+          <a href="{{ m.prefix }}">{{ m.nav_label }}</a>
+          {% endfor %}
+        {% endif %}
       </nav>
-      {% if path.startswith("/module2") %}
+      {% if module and module.show_calibration_pill %}
       <div class="calib-pill">Calibration: <a href="/module2/calibration" id="active-calib-label">…</a></div>
       {% endif %}
     </div>

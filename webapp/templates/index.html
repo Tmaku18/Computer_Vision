@@ -8,26 +8,17 @@
 </p>
 
 <div class="grid grid-2">
-  <a class="card step-card" href="/module2">
-    <span class="num">Module 2</span>
-    <h2>Camera calibration &amp; real-world measurement</h2>
-    <p>
-      Calibrate a smartphone camera, measure 2D object dimensions with perspective
-      projection, validate 20 measurements from more than 2 m, and derive the
-      two-camera image relationship.
-    </p>
+  {% for m in modules %}
+  <a class="card step-card" href="{{ m.prefix }}">
+    <span class="num">{{ m.nav_label }}</span>
+    <h2>{{ m.card_title }}</h2>
+    <p>{{ m.blurb }}</p>
     <p class="small" style="margin-top:0.75rem">
-      <span class="badge ok">Live</span>
-      Step 1 · Step 2 · Step 3 · Theory · Report
+      <span class="badge ok">{{ m.status }}</span>
+      {{ m.steps }}
+      <span class="muted">· code in {{ m.folder }}/</span>
     </p>
   </a>
-
-  <div class="card">
-    <h2>Other modules</h2>
-    <p class="muted">
-      New assignments are added to this page as they are completed, so every
-      module stays reachable from one place.
-    </p>
-  </div>
+  {% endfor %}
 </div>
 {% endblock %}

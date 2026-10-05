@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+{% endblock %}
+{% block content %}
+<h1>Blur: spatial filter vs. Fourier multiply</h1>
+<p class="lead">
+  The spatial result is a direct weighted sum of neighbors. The Fourier result multiplies transforms.
+  They match when the borders match: zero padding for “linear”, wrap-around for “circular”.
+</p>
+
+<div class="workspace">
+  <div>
+    <div class="card">
+      <div class="figure-grid" id="results">
+        <figure><img alt="" id="img-original"><figcaption>Original</figcaption></figure>
+        <figure><img alt="" id="img-spatial"><figcaption>Spatial convolution</figcaption></figure>
+        <figure><img alt="" id="img-fft"><figcaption>Fourier multiply</figcaption></figure>
+        <figure><img alt="" id="img-difference"><figcaption>Absolute difference</figcaption></figure>
+      </div>
+      <div id="metrics" class="stat-grid" style="margin-top:0.9rem"></div>
+      <p class="hint" id="border-note"></p>
+    </div>
+    <div class="card">
+      <h2>Spectra</h2>
+      <p class="hint">Log magnitude, low frequencies in the center. Blur keeps the bright center and wipes the edges of the spectrum.</p>
+      <div class="figure-grid">
+        <figure><img alt="" id="img-spec-image"><figcaption>Image spectrum \(F\)</figcaption></figure>
+        <figure><img alt="" id="img-spec-kernel"><figcaption>Kernel spectrum \(H\)</figcaption></figure>
+        <figure><img alt="" id="img-spec-product"><figcaption>Product \(F \cdot H\)</figcaption></figure>
+        <figure><img alt="" id="img-kernel"><figcaption>Kernel (bright = larger weight)</figcaption></figure>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Time vs. kernel size</h2>
+      <p class="hint">Same Gaussian blur. The spatial sum slows down as the kernel grows; the FFT size barely changes.</p>
+      <canvas id="chart-timing" height="120"></canvas>
+    </div>
+  </div>
+
+  <div class="stack">
+    <div class="card">
+      <h2>Image</h2>
+      <label class="file-drop" id="drop">
+        Drop a photo here, or click to choose
+        <input type="file" id="photo" accept="image/*,.heic,.heif">
+      </label>
+      <p class="hint" id="photo-name">Using the built-in test image until you upload one.</p>
+    </div>
+    <div class="card stack">
+      <h2>Kernel</h2>
+      <div class="field">
+        <label for="kernel">Shape</label>
+        <select id="kernel">
+          <option value="gaussian" selected>Gaussian (smooth blur)</option>
+          <option value="box">Box (simple average)</option>
+          <option value="disk">Disk (defocus)</option>
+          <option value="motion">Motion (streak)</option>
+        </select>
+      </div>
+      <div class="fields">
+        <div class="field"><label for="size">Size (odd)</label><input type="number" id="size" value="15" min="3" max="51" step="2"></div>
+        <div class="field" id="field-sigma"><label for="sigma">Sigma</label><input type="number" id="sigma" value="3" min="0.2" max="30" step="0.1"></div>
+        <div class="field" id="field-angle" hidden><label for="angle">Angle (deg)</label><input type="number" id="angle" value="25" min="-180" max="180" step="1"></div>
+      </div>
+      <div class="field">
+        <label for="mode">Boundary</label>
+        <select id="mode">
+          <option value="linear" selected>Linear — zeros outside the image</option>
+          <option value="circular">Circular — image wraps around</option>
+        </select>
+      </div>
+      <button type="button" id="btn-blur">Blur both ways</button>
+      <div class="msg" id="msg"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script type="module" src="/static/js/blur.js"></script>
+{% endblock %}
