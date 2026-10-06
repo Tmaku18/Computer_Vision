@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "description": "Boxes are [x, y, width, height] in pixels. OpenCV and SAM2 must use the same box. Sample masks in HW3/samples/sam2/ are not SAM2 output; sam2_masks.py writes the real ones to HW3/sam2_masks/.",
+  "prompts": [
+    {
+      "image": "HW3/samples/rgb_wall.png",
+      "kind": "rgb",
+      "method": "grabcut",
+      "box": [
+        165,
+        71,
+        151,
+        244
+      ],
+      "note": "Plain background. The empty frame is rgb_wall_empty.png.",
+      "background": "HW3/samples/rgb_wall_empty.png"
+    },
+    {
+      "image": "HW3/samples/rgb_clutter.png",
+      "kind": "rgb",
+      "method": "grabcut",
+      "box": [
+        165,
+        71,
+        151,
+        244
+      ],
+      "note": "Cluttered background. GrabCut has to separate similar colors."
+    },
+    {
+      "image": "HW3/samples/thermal_person.png",
+      "kind": "thermal",
+      "method": "thermal",
+      "box": [
+        190,
+        78,
+        149,
+        249
+      ],
+      "note": "One warm person on a cool background."
+    },
+    {
+      "image": "HW3/samples/thermal_room.png",
+      "kind": "thermal",
+      "method": "thermal",
+      "box": [
+        190,
+        78,
+        149,
+        249
+      ],
+      "note": "A wide warm bar (a window or a lamp) sits beside the person. Aspect ratio drops it."
+    },
+    {
+      "image": "HW3/samples/thermal_two.png",
+      "kind": "thermal",
+      "method": "thermal",
+      "box": [
+        413,
+        82,
+        135,
+        227
+      ],
+      "note": "Two people. The box selects the person on the right, which is the prompt SAM2 would see."
+    }
+  ]
+}

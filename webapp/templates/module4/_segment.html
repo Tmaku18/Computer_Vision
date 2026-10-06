@@ -1,0 +1,120 @@
+<div id="m4" data-mode="{{ mode }}">
+  <h1>{% if mode == "thermal" %}Thermal person outline{% else %}RGB person outline{% endif %}</h1>
+  <p class="lead">
+    {% if mode == "thermal" %}
+    Warm people are the bright blobs. CLAHE, a small blur, and Otsu find them; blobs that are too small
+    or too wide are dropped. The box is the same hint SAM2 gets.
+    {% else %}
+    GrabCut fits color models to this one photo. It does not load a trained network.
+    Watershed is the deterministic alternative. Background differencing needs a second photo of the empty scene.
+    {% endif %}
+  </p>
+
+  <div class="workspace">
+    <div>
+      <div class="card">
+        <div class="canvas-wrap">
+          <canvas id="stage"></canvas>
+          <div class="placeholder" id="placeholder">Choose a sample or upload a photo, then drag a box around the person.</div>
+        </div>
+        <div class="canvas-toolbar">
+          <span>Drag to draw the box. Both the classical method and SAM2 use it.</span>
+          <span class="spacer"></span>
+          <span id="box-label" class="mono"></span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="figure-grid">
+          <figure><img alt="Classical mask" id="img-mask"><figcaption>Mask</figcaption></figure>
+          <figure><img alt="Outline on the photo" id="img-overlay"><figcaption>Outline</figcaption></figure>
+          <figure><img alt="Comparison with SAM2" id="img-compare"><figcaption>Comparison</figcaption></figure>
+        </div>
+        <p class="small" style="margin-top:0.6rem">
+          <span class="legend-dot" style="background:#00c853"></span>both
+          <span class="legend-dot" style="background:#0088dd"></span>OpenCV only
+          <span class="legend-dot" style="background:#e23b3b"></span>SAM2 only
+        </p>
+        <div id="metrics" class="stat-grid" style="margin-top:0.75rem"></div>
+      </div>
+    </div>
+
+    <div class="stack">
+      <div class="card stack">
+        <h2>Image</h2>
+        <div class="field">
+          <label for="sample">Sample</label>
+          <select id="sample"><option value="">Upload instead…</option></select>
+        </div>
+        <label class="file-drop" id="drop">
+          Drop a photo, or click to choose
+          <input type="file" id="photo" accept="image/*,.heic,.heif">
+        </label>
+        <p class="hint" id="photo-name"></p>
+      </div>
+
+      <div class="card stack">
+        <h2>Method</h2>
+        {% if mode == "rgb" %}
+        <div class="field">
+          <label for="method">Classical method</label>
+          <select id="method">
+            <option value="grabcut" selected>GrabCut (box seed)</option>
+            <option value="watershed">Watershed (box markers)</option>
+            <option value="background">Background difference</option>
+          </select>
+        </div>
+        <div class="fields">
+          <div class="field" id="field-iterations"><label for="iterations">GrabCut iterations</label><input type="number" id="iterations" value="5" min="1" max="12"></div>
+          <div class="field"><label for="open-k">Open kernel</label><input type="number" id="open-k" value="5" min="1" max="21" step="2"></div>
+          <div class="field"><label for="close-k">Close kernel</label><input type="number" id="close-k" value="7" min="1" max="31" step="2"></div>
+        </div>
+        <div id="bg-fields" hidden>
+          <div class="field">
+            <label for="bg-sample">Empty frame (sample)</label>
+            <select id="bg-sample"><option value="">None</option></select>
+          </div>
+          <label class="file-drop">
+            Or upload the empty scene
+            <input type="file" id="bg-photo" accept="image/*,.heic,.heif">
+          </label>
+          <div class="field"><label for="threshold">Difference threshold</label><input type="number" id="threshold" value="25" min="1" max="255"></div>
+          <p class="hint" id="bg-name"></p>
+        </div>
+        {% else %}
+        <input type="hidden" id="method" value="thermal">
+        <label class="row"><input type="checkbox" id="invert"> Palette is inverted (hot is dark)</label>
+        <label class="row"><input type="checkbox" id="split"> Split people who are touching</label>
+        <div class="fields">
+          <div class="field"><label for="min-area">Min area (px, blank = auto)</label><input type="number" id="min-area" min="1" placeholder="auto"></div>
+          <div class="field"><label for="max-aspect">Max aspect h/w</label><input type="number" id="max-aspect" value="4.5" min="1.1" max="12" step="0.1"></div>
+        </div>
+        <div class="fields">
+          <div class="field"><label for="clahe">CLAHE clip</label><input type="number" id="clahe" value="2" min="0.5" max="8" step="0.1"></div>
+          <div class="field"><label for="blur">Blur size</label><input type="number" id="blur" value="5" min="1" max="21" step="2"></div>
+        </div>
+        <div class="fields">
+          <div class="field"><label for="open-k">Open kernel</label><input type="number" id="open-k" value="3" min="1" max="21" step="2"></div>
+          <div class="field"><label for="close-k">Close kernel</label><input type="number" id="close-k" value="7" min="1" max="31" step="2"></div>
+        </div>
+        {% endif %}
+        <button type="button" id="btn-run">Outline the person</button>
+        <div class="msg" id="msg"></div>
+      </div>
+
+      <div class="card stack">
+        <h2>SAM2 mask</h2>
+        <p class="hint">Same box. Pick a mask already on the server, or upload one from Meta's demo or from <code>sam2_masks.py</code>.</p>
+        <div class="field">
+          <label for="sam2">Precomputed mask</label>
+          <select id="sam2"><option value="">None</option></select>
+        </div>
+        <label class="file-drop">
+          Upload a mask PNG
+          <input type="file" id="mask-file" accept="image/png,image/*,.png">
+        </label>
+        <p class="hint" id="mask-name"></p>
+        <button type="button" id="btn-prompts" class="secondary">Download prompts.json</button>
+      </div>
+    </div>
+  </div>
+</div>

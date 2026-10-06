@@ -1,0 +1,97 @@
+<p>
+  An edge is a place where intensity changes over a short distance. A short distance is a high spatial
+  frequency, so an edge detector is a high-pass filter. Smoothing is the opposite: a low-pass filter
+  removes those frequencies and the edges go soft.
+</p>
+
+<h3>Derivative theorem</h3>
+<p>
+  Differentiate a function and the Fourier transform picks up a ramp in frequency. With \(u\) and \(v\)
+  in cycles per pixel,
+</p>
+<div class="math-block">\[
+  \mathcal{F}\!\left\{\frac{\partial f}{\partial x}\right\} = j 2\pi u\, F(u,v),
+  \qquad
+  \mathcal{F}\!\left\{\frac{\partial f}{\partial y}\right\} = j 2\pi v\, F(u,v).
+\]</div>
+<p>
+  The gradient magnitude is \(\sqrt{|\partial f/\partial x|^2 + |\partial f/\partial y|^2}\).
+  In the discrete image this is one FFT, two multiplies, and two inverse FFTs. No kernel is slid across the picture.
+</p>
+
+<h3>Laplacian</h3>
+<p>
+  The Laplacian is the sum of the second derivatives. Differentiating twice multiplies by \((j 2\pi u)^2 = -4\pi^2 u^2\), so
+</p>
+<div class="math-block">\[
+  \mathcal{F}\{\nabla^2 f\} = -4\pi^2 (u^2 + v^2)\, F(u,v).
+\]</div>
+<p>
+  On a grid the matching operator is the neighbor sum
+  \(L f = f_{x-1} + f_{x+1} + f_{y-1} + f_{y+1} - 4f\).
+  Its DFT is exact, not an approximation:
+</p>
+<div class="math-block">\[
+  H(u,v) = -4 + 2\cos(2\pi u) + 2\cos(2\pi v).
+\]</div>
+<p>
+  The Taylor step \(\cos\theta \approx 1 - \theta^2/2\) turns \(H\) into \(-4\pi^2(u^2+v^2)\) when \(u\) and \(v\) are small.
+  At high frequency the cosine saturates and the continuous formula does not. The code checks the discrete form:
+  the neighbor sum and the multiply-by-\(H\) agree to roundoff (about \(10^{-15}\) on a random array).
+  Edges of the Laplacian are its zero crossings, the same idea as the Marr–Hildreth detector.
+</p>
+
+<h3>High-pass shapes, and ringing</h3>
+<p>
+  Let \(D(u,v)\) be the distance from DC (the center of the shifted spectrum) and \(D_0\) the cutoff.
+</p>
+<ul>
+  <li>Ideal: \(H = 0\) when \(D \le D_0\), and \(1\) otherwise. The cutoff is a sharp disk, whose inverse transform oscillates. Those oscillations show up as rings beside strong edges (the Gibbs effect).</li>
+  <li>Butterworth of order \(n\): \(H = 1 / (1 + (D_0/D)^{2n})\). Larger \(n\) is closer to the ideal disk, so it rings more.</li>
+  <li>Gaussian: \(H = 1 - \exp(-D^2 / (2 D_0^2))\). The transform of a Gaussian is a Gaussian, so this one does not ring. Its complement is the blur from Module 3.</li>
+</ul>
+<p>
+  A region map from the same filters is the low-pass image \( (1-H) F \), then Otsu. Smoothing suppresses edges; the threshold then splits the smooth picture into pieces.
+</p>
+
+<h3>LoG and DoG</h3>
+<p>
+  The Laplacian of a Gaussian is a band-pass: the Gaussian kills the highest noise, and the Laplacian kills DC.
+  A difference of Gaussians,
+</p>
+<div class="math-block">\[
+  \mathrm{DoG} = G_{\sigma_1} * f - G_{\sigma_2} * f, \qquad \sigma_2 > \sigma_1,
+\]</div>
+<p>
+  approximates it. Zero crossings of the DoG are the edges. The sign of the DoG is a coarse region label
+  (bright blob versus dark surround).
+</p>
+
+<h3>Texture from local spectra</h3>
+<p>
+  A Gabor filter is a sinusoid under a Gaussian envelope, so it responds to one orientation and one spacing.
+  A bank of them (several angles, two widths, two wavelengths) turns texture into energy
+  \(\sqrt{\sum r_i^2}\). Otsu on that energy separates textured regions from flat ones, which a plain
+  intensity threshold cannot do when the two regions have the same average gray level.
+</p>
+
+<h3>Worked numbers</h3>
+<p>
+  Take a row of \(N\) pixels and the frequency bin \(k = 1\), so \(u = 1/N\) cycles per pixel and \(v = 0\).
+</p>
+<div class="math-block">\[
+  H_{\text{discrete}} = -4 + 2\cos(2\pi / N) + 2,
+  \qquad
+  H_{\text{continuous}} = -4\pi^2 / N^2.
+\]</div>
+<p>
+  For \(N = 8\): \(\cos(2\pi/8) = \cos(\pi/4) = \sqrt{2}/2\), so
+  \(H_{\text{discrete}} = -2 + \sqrt{2} \approx -0.5858\) and
+  \(H_{\text{continuous}} = -\pi^2/16 \approx -0.6169\).
+  They are close, and they get closer as \(N\) grows and this bin becomes a lower frequency. The checker below recomputes both.
+</p>
+<div class="fields">
+  <div class="field"><label for="ex-n">Width N</label><input type="number" id="ex-n" value="8" min="4" max="256"></div>
+  <div class="field"><label for="ex-k">Bin k</label><input type="number" id="ex-k" value="1" min="0" max="128"></div>
+</div>
+<dl class="kv" id="ex-out"></dl>

@@ -1,0 +1,146 @@
+{
+  "note": "Masks in HW3/samples/sam2/ are eroded ground truth so the demo has an overlay before SAM2 is installed. Masks in HW3/sam2_masks/ replace them after you run sam2_masks.py, and those are the numbers to cite.",
+  "images": [
+    {
+      "image": "HW3/samples/rgb_wall.png",
+      "kind": "rgb",
+      "method": "grabcut",
+      "box": [
+        165,
+        71,
+        151,
+        244
+      ],
+      "sam2_mask": "HW3/samples/sam2/rgb_wall.png",
+      "metrics": {
+        "iou": 0.9375689388925657,
+        "dice": 0.9677786633268814,
+        "precision": 0.9375689388925657,
+        "recall": 1.0,
+        "boundary_precision": 0.991812865497076,
+        "boundary_recall": 0.8740894901144641,
+        "boundary_f": 0.9292374804973883,
+        "boundary_tolerance_px": 2,
+        "hausdorff_px": 23.875045776367188,
+        "mean_boundary_px": 1.5676240921020508
+      },
+      "note": "Plain background. The empty frame is rgb_wall_empty.png."
+    },
+    {
+      "image": "HW3/samples/rgb_clutter.png",
+      "kind": "rgb",
+      "method": "grabcut",
+      "box": [
+        165,
+        71,
+        151,
+        244
+      ],
+      "sam2_mask": "HW3/samples/sam2/rgb_clutter.png",
+      "metrics": {
+        "iou": 0.8587593453222874,
+        "dice": 0.9240134797260572,
+        "precision": 0.8587593453222874,
+        "recall": 1.0,
+        "boundary_precision": 0.8523076923076923,
+        "boundary_recall": 0.8595213319458896,
+        "boundary_f": 0.8558993130046554,
+        "boundary_tolerance_px": 2,
+        "hausdorff_px": 43.930084228515625,
+        "mean_boundary_px": 3.205324411392212
+      },
+      "note": "Cluttered background. GrabCut has to separate similar colors."
+    },
+    {
+      "image": "HW3/samples/thermal_person.png",
+      "kind": "thermal",
+      "method": "thermal",
+      "box": [
+        190,
+        78,
+        149,
+        249
+      ],
+      "sam2_mask": "HW3/samples/sam2/thermal_person.png",
+      "metrics": {
+        "iou": 0.9407791498942485,
+        "dice": 0.9694860437319834,
+        "precision": 0.9407791498942485,
+        "recall": 1.0,
+        "boundary_precision": 0.9943566591422122,
+        "boundary_recall": 0.879154078549849,
+        "boundary_f": 0.9332134530437519,
+        "boundary_tolerance_px": 2,
+        "hausdorff_px": 25.785049438476562,
+        "mean_boundary_px": 1.587454915046692
+      },
+      "note": "One warm person on a cool background."
+    },
+    {
+      "image": "HW3/samples/thermal_room.png",
+      "kind": "thermal",
+      "method": "thermal",
+      "box": [
+        190,
+        78,
+        149,
+        249
+      ],
+      "sam2_mask": "HW3/samples/sam2/thermal_room.png",
+      "metrics": {
+        "iou": 0.939945466939332,
+        "dice": 0.9690431849327102,
+        "precision": 0.939945466939332,
+        "recall": 1.0,
+        "boundary_precision": 0.9943566591422122,
+        "boundary_recall": 0.8761329305135952,
+        "boundary_f": 0.9315086473272313,
+        "boundary_tolerance_px": 2,
+        "hausdorff_px": 25.785049438476562,
+        "mean_boundary_px": 1.6086094379425049
+      },
+      "note": "A wide warm bar (a window or a lamp) sits beside the person. Aspect ratio drops it."
+    },
+    {
+      "image": "HW3/samples/thermal_two.png",
+      "kind": "thermal",
+      "method": "thermal",
+      "box": [
+        413,
+        82,
+        135,
+        227
+      ],
+      "sam2_mask": "HW3/samples/sam2/thermal_two.png",
+      "metrics": {
+        "iou": 0.9399355877616747,
+        "dice": 0.9690379347555408,
+        "precision": 0.9399355877616747,
+        "recall": 1.0,
+        "boundary_precision": 0.9937733499377335,
+        "boundary_recall": 0.8765294771968855,
+        "boundary_f": 0.9314765739916425,
+        "boundary_tolerance_px": 2,
+        "hausdorff_px": 24.830047607421875,
+        "mean_boundary_px": 1.5048991441726685
+      },
+      "note": "Two people. The box selects the person on the right, which is the prompt SAM2 would see."
+    }
+  ],
+  "summary": {
+    "rgb": {
+      "n": 2,
+      "mean_iou": 0.8981641421074265,
+      "mean_dice": 0.9458960715264693,
+      "mean_boundary_f": 0.8925683967510218,
+      "mean_hausdorff_px": 33.902565002441406
+    },
+    "thermal": {
+      "n": 3,
+      "mean_iou": 0.9402200681984184,
+      "mean_dice": 0.9691890544734115,
+      "mean_boundary_f": 0.9320662247875419,
+      "mean_hausdorff_px": 25.466715494791668
+    }
+  }
+}

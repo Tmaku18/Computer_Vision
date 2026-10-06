@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card no-print stack">
+  <h2>Report settings</h2>
+  <div class="fields">
+    <div class="field" style="flex:2"><label for="repo-url">GitHub repository</label><input type="url" id="repo-url" value="https://github.com/Tmaku18/Computer_Vision"></div>
+    <div class="field" style="flex:2"><label for="app-url">Web application</label><input type="url" id="app-url"></div>
+    <div class="field"><label for="video-url">Video (optional)</label><input type="url" id="video-url"></div>
+  </div>
+  <div class="row">
+    <button type="button" id="btn-print">Print / Save as PDF</button>
+    <span class="hint">The table is whatever <code>HW3/compare_sam2.py</code> last wrote.</span>
+  </div>
+</div>
+
+<article id="report">
+  <div class="card">
+    <h1>CSc 8830 Computer Vision · Module 4 Assignment</h1>
+    <p><strong>Tanaka Makuvaza</strong> · <span id="r-date"></span></p>
+    <dl class="kv">
+      <dt>GitHub repository</dt><dd><a id="r-repo"></a></dd>
+      <dt>Web application</dt><dd><a id="r-app"></a></dd>
+      <dt>Demonstration video</dt><dd><a id="r-video"></a></dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <h2>What was measured</h2>
+    <p>
+      A person is outlined twice from the same box. The classical side is OpenCV with no trained weights:
+      GrabCut on color photos (a graph cut whose color models are fit to that photo alone), marker-based
+      watershed as a second method, and background differencing when the camera does not move.
+      Thermal images use CLAHE, Otsu, and a filter that keeps blobs with a person-like area and aspect ratio.
+      The other side is SAM2, prompted with that same box and saved as a PNG. The hosted site never loads SAM2.
+    </p>
+    <p>
+      Scores are intersection-over-union, Dice, precision, recall, boundary F at a 2-pixel tolerance,
+      Hausdorff distance, and the mean distance between the two boundaries.
+      Hausdorff is the single worst pair of boundary pixels, so a filled gap under an arm can be
+      tens of pixels even when IoU is above 0.98. The mean boundary distance is the typical miss.
+      The overlay paints both methods green, OpenCV only blue, and SAM2 only red.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>Results</h2>
+    <p id="r-note" class="muted"></p>
+    <div class="table-wrap"><table>
+      <thead>
+        <tr>
+          <th>Image</th><th>Kind</th><th>Method</th>
+          <th class="num">IoU</th><th class="num">Dice</th><th class="num">Boundary F</th><th class="num">Hausdorff</th>
+        </tr>
+      </thead>
+      <tbody id="r-rows"></tbody>
+    </table></div>
+    <h3>Means</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Set</th><th class="num">n</th><th class="num">Mean IoU</th><th class="num">Mean boundary F</th></tr></thead>
+      <tbody id="r-summary"></tbody>
+    </table></div>
+  </div>
+
+  <div class="card">
+    <h2>Where the classical outline loses</h2>
+    <ul>
+      <li><strong>Hair and thin limbs.</strong> Morphological opening, which removes speckle, also erases strands that are thinner than the kernel. SAM2 keeps them because it was trained on people, not because the box told it the hair color.</li>
+      <li><strong>Shadows and low contrast.</strong> GrabCut's color model treats a dark shadow as a second foreground color, or gives up when the shirt matches the wall. A thermal image has the same failure when the room is warm and the person is not much brighter.</li>
+      <li><strong>Clutter inside the box.</strong> Everything outside the box is background, but anything inside can be claimed. A busy room inside a loose box is where watershed and GrabCut disagree with SAM2.</li>
+      <li><strong>Touching people.</strong> Otsu sees one bright blob. The optional distance-transform split helps only when the join is thinner than the bodies.</li>
+    </ul>
+    <p>
+      Background differencing avoids the color ambiguity when the camera is fixed and the empty frame is available.
+      It fails if the camera moves or the light changes between the two shots.
+    </p>
+    <p id="r-standin">
+      The masks shipped in <code>HW3/samples/sam2/</code> are not SAM2. They are the synthetic figure eroded
+      by a few pixels, so the overlay and the metrics have something to show before SAM2 is installed.
+      After <code>sam2_masks.py</code> writes <code>HW3/sam2_masks/</code>, rerun <code>compare_sam2.py</code>
+      and reload this page. Those are the numbers to cite.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>Fourier segmentation</h2>
+    {% include "module4/_theory_content.html" %}
+  </div>
+
+  <div class="card">
+    <h2>References</h2>
+    <ul>
+      <li>C. Rother, V. Kolmogorov, A. Blake. “GrabCut”: interactive foreground extraction using iterated graph cuts. <em>ACM SIGGRAPH</em>, 2004.</li>
+      <li>N. Otsu. A threshold selection method from gray-level histograms. <em>IEEE Trans. Systems, Man, and Cybernetics</em>, 1979.</li>
+      <li>F. Meyer. Topographic distance and watershed lines. <em>Signal Processing</em>, 1994. S. Beucher and F. Meyer, the morphological approach to segmentation, 1993.</li>
+      <li>K. Zuiderveld. Contrast limited adaptive histogram equalization. <em>Graphics Gems IV</em>, 1994.</li>
+      <li>D. Marr, E. Hildreth. Theory of edge detection. <em>Proc. Royal Society B</em>, 1980.</li>
+      <li>R. C. Gonzalez, R. E. Woods. <em>Digital Image Processing</em>, chapters on frequency-domain filtering.</li>
+      <li>N. Ravi et al. SAM 2: Segment Anything in Images and Videos. arXiv:2408.00714, 2024.</li>
+    </ul>
+    <p class="small muted">
+      Thermal photos for the real experiment come from a public set (Roboflow “thermal person”, or LLVIP).
+      Cite the set you actually downloaded in the sentence above this one before you export the PDF.
+      The pictures in <code>HW3/samples/</code> are synthetic and are not that dataset.
+    </p>
+  </div>
+</article>
+{% endblock %}
+{% block scripts %}
+<script type="module" src="/static/js/module4-report.js"></script>
+<script type="module" src="/static/js/module4-theory.js"></script>
+{% endblock %}

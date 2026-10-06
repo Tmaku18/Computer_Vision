@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Theory · Edges and regions in the Fourier domain</h1>
+<p class="lead">
+  The same outline a spatial filter finds by looking at neighbors can be found by multiplying the image's
+  Fourier transform by a weight \(H(u,v)\) and transforming back.
+</p>
+<div class="card theory">
+  {% include "module4/_theory_content.html" %}
+</div>
+{% endblock %}
+{% block scripts %}
+<script type="module" src="/static/js/module4-theory.js"></script>
+{% endblock %}

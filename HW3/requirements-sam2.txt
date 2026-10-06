@@ -1,0 +1,19 @@
+# SAM2 only. Install into a separate virtualenv so the hosted app stays small.
+# Python 3.12 is the safe choice: the course environment is newer, and PyTorch
+# often has no wheel for the newest Python yet.
+#
+#   python3.12 -m venv .venv-sam2
+#   .venv-sam2/bin/pip install -r HW3/requirements-sam2.txt
+#
+# Then download the small checkpoint (about 180 MB). The URL is in the header
+# of HW3/sam2_masks.py.
+#
+# If this install fails, use Meta's online SAM2 demo, save the mask PNG, and
+# upload it on the Module 4 RGB or Thermal page.
+
+torch>=2.4
+torchvision>=0.19
+numpy
+opencv-python-headless
+pillow
+sam2 @ git+https://github.com/facebookresearch/sam2.git

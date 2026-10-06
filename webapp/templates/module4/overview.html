@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Module 4 · Human boundaries in RGB and thermal images</h1>
+<p class="lead">
+  Outline a person with classical OpenCV — no trained detector — then compare that outline with SAM2,
+  which sees the same box. The Fourier page shows how edges and regions come from the frequency domain.
+</p>
+
+<div class="grid grid-3">
+  <a class="card step-card" href="/module4/rgb">
+    <span class="num">Part 1</span>
+    <h2>RGB photo</h2>
+    <p>GrabCut, watershed, or a fixed-camera background difference. Drag a box around the person and compare with a SAM2 mask.</p>
+  </a>
+  <a class="card step-card" href="/module4/thermal">
+    <span class="num">Part 2</span>
+    <h2>Thermal image</h2>
+    <p>CLAHE, Otsu, and person-shaped blobs. Warm people are bright; a palette that draws them dark can be inverted.</p>
+  </a>
+  <a class="card step-card" href="/module4/fourier">
+    <span class="num">Theory demo</span>
+    <h2>Fourier edges</h2>
+    <p>Ideal, Butterworth, and Gaussian high-pass filters, the frequency-domain Laplacian, DoG zero crossings, and Gabor energy.</p>
+  </a>
+  <a class="card step-card" href="/module4/theory">
+    <span class="num">Theory</span>
+    <h2>Derivation</h2>
+    <p>Why edges are high frequencies, how the derivative theorem puts the gradient and the Laplacian in the Fourier domain, and a numeric example.</p>
+  </a>
+  <a class="card step-card" href="/module4/report">
+    <span class="num">Report</span>
+    <h2>Printable report</h2>
+    <p>Per-image scores, RGB versus thermal, where classical outlines fail, and the citations.</p>
+  </a>
+</div>
+
+<div class="card">
+  <h2>Code</h2>
+  <p>
+    The segmentation lives in <code>HW3/segment_core.py</code>. SAM2 runs only on your machine
+    (<code>HW3/sam2_masks.py</code>) and saves plain PNG masks the site can read.
+    Step-by-step commands are in <code>HW3/RUN_ASSIGNMENT.md</code>.
+  </p>
+  <ul>
+    <li><code>HW3/segment_rgb.py</code> — one color photo, or every RGB row in <code>prompts.json</code>.</li>
+    <li><code>HW3/segment_thermal.py</code> — the thermal pipeline.</li>
+    <li><code>HW3/compare_sam2.py</code> — IoU, Dice, boundary F, Hausdorff, and the summary table.</li>
+    <li><code>HW3/fourier_segmentation.py</code> — the frequency-domain filters, including the Laplacian check.</li>
+  </ul>
+</div>
+{% endblock %}

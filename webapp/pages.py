@@ -51,6 +51,28 @@ MODULES = [
             ("/module3/report", "Report"),
         ],
     },
+    {
+        "id": "module4",
+        "prefix": "/module4",
+        "nav_label": "Module 4",
+        "card_title": "Human boundaries in RGB and thermal images",
+        "blurb": (
+            "Outline a person with classical OpenCV in a color photo and in a thermal image, "
+            "compare both outlines with SAM2 using the same box, and derive Fourier-domain edges."
+        ),
+        "status": "Live",
+        "folder": "HW3",
+        "steps": "RGB · Thermal · Fourier · Theory · Report",
+        "show_calibration_pill": False,
+        "links": [
+            ("/module4", "Module 4"),
+            ("/module4/rgb", "RGB"),
+            ("/module4/thermal", "Thermal"),
+            ("/module4/fourier", "Fourier"),
+            ("/module4/theory", "Theory"),
+            ("/module4/report", "Report"),
+        ],
+    },
 ]
 
 # path without the leading slash -> (template, title)
@@ -66,6 +88,12 @@ PAGES = {
     "module3/blur": ("module3/blur.html", "Blurring"),
     "module3/theory": ("module3/theory.html", "Theory · Convolution theorem"),
     "module3/report": ("module3/report.html", "Report"),
+    "module4": ("module4/overview.html", "Module 4"),
+    "module4/rgb": ("module4/rgb.html", "RGB boundaries"),
+    "module4/thermal": ("module4/thermal.html", "Thermal boundaries"),
+    "module4/fourier": ("module4/fourier.html", "Fourier edges"),
+    "module4/theory": ("module4/theory.html", "Theory · Fourier segmentation"),
+    "module4/report": ("module4/report.html", "Report"),
 }
 
 
