@@ -2,7 +2,7 @@
 
 Course assignments, with a web application that demonstrates each one.
 
-- **Web app:** _deployment link added here after hosting is set up_ (run it locally with the commands below).
+- **Web app:** https://csc8830-computer-vision.vercel.app (run it locally with the commands below).
 - **Module 2** (folder `HW1`): smartphone camera calibration, real-world 2D measurement, validation at > 2 m, two-camera theory. Guide: [`HW1/RUN_ASSIGNMENT.md`](HW1/RUN_ASSIGNMENT.md).
 - **Module 3** (folder `HW2`): image blurring with spatial filters and the matching Fourier-domain multiply. Guide: [`HW2/RUN_ASSIGNMENT.md`](HW2/RUN_ASSIGNMENT.md).
 - **Module 4** (folder `HW3`): classical human boundaries in RGB and thermal images, compared with SAM2, plus Fourier-domain edges. Guide: [`HW3/RUN_ASSIGNMENT.md`](HW3/RUN_ASSIGNMENT.md).

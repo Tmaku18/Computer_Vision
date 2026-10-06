@@ -17,6 +17,10 @@ HW1/validation_images/*
 # Web app runtime data (uploads, user calibrations)
 data/
 
+# Vercel CLI link metadata and local env
+.vercel/
+.env*
+
 # SAM2 is installed in its own environment. The checkpoint is about 180 MB.
 .venv-sam2/
 HW3/checkpoints/
