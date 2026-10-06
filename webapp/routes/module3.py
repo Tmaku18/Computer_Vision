@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import uuid
 
 import cv2
 import numpy as np
@@ -12,7 +11,7 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
-from webapp.storage import RESULT_DIR, ROOT, read_image, safe_id, write_png
+from webapp.storage import ROOT, data_url, read_image
 from filtering_core import (
     blur_pair,
     demo_image,
@@ -78,22 +77,17 @@ async def blur(req: BlurRequest):
         result = blur_pair(image, kernel, mode=req.mode)
         spec = spectra(image, kernel, mode=req.mode)
         diff, diff_info = difference_map(result["spatial"], result["frequency"])
-        result_id = uuid.uuid4().hex[:12]
-        folder = RESULT_DIR / result_id
-        files = {
-            "original": to_uint8(image),
-            "spatial": to_uint8(result["spatial"]),
-            "fft": to_uint8(result["frequency"]),
-            "difference": diff,
-            "spectrum_image": spec["image"],
-            "spectrum_kernel": spec["kernel"],
-            "spectrum_product": spec["product"],
-            "kernel": _kernel_preview(kernel),
+        pictures = {
+            "original": (to_uint8(image), "jpg"),
+            "spatial": (to_uint8(result["spatial"]), "jpg"),
+            "fft": (to_uint8(result["frequency"]), "jpg"),
+            "difference": (diff, "png"),
+            "spectrum_image": (spec["image"], "png"),
+            "spectrum_kernel": (spec["kernel"], "png"),
+            "spectrum_product": (spec["product"], "png"),
+            "kernel": (_kernel_preview(kernel), "png"),
         }
-        for name, picture in files.items():
-            write_png(folder / f"{name}.png", picture)
         return {
-            "id": result_id,
             "source": source,
             "scale": scale,
             "width": int(image.shape[1]),
@@ -105,7 +99,7 @@ async def blur(req: BlurRequest):
             "metrics": result["metrics"],
             "timing_s": result["timing_s"],
             "difference": diff_info,
-            **{f"{name}_url": f"/api/m3/results/{result_id}/{name}.png" for name in files},
+            **{f"{name}_url": data_url(picture, kind) for name, (picture, kind) in pictures.items()},
         }
 
     return await run_in_threadpool(work)
@@ -169,12 +163,3 @@ def example(req: ExampleRequest):
         raise HTTPException(400, str(exc)) from exc
 
 
-@router.get("/api/m3/results/{result_id}/{name}.png", include_in_schema=False)
-def result_png(result_id: str, name: str):
-    allowed = {"original", "spatial", "fft", "difference", "spectrum_image", "spectrum_kernel", "spectrum_product", "kernel"}
-    if name not in allowed:
-        raise HTTPException(404)
-    path = RESULT_DIR / safe_id(result_id) / f"{name}.png"
-    if not path.is_file():
-        raise HTTPException(404)
-    return FileResponse(path, media_type="image/png")

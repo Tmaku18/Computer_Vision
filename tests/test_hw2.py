@@ -84,7 +84,7 @@ def test_blur_api_on_demo_image():
     assert body["metrics"]["max_abs"] < 1e-8
     assert body["width"] > 10
     for key in ("spatial_url", "fft_url", "difference_url"):
-        assert client.get(body[key]).status_code == 200
+        assert body[key].startswith("data:image/")
 
 
 def test_verify_api_passes():

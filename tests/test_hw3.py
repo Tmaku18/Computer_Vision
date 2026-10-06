@@ -139,9 +139,8 @@ def test_sample_segmentation_api():
     assert res.status_code == 200, res.text
     body = res.json()
     assert body["metrics"]["iou"] > 0.9
-    assert body["mask_url"].endswith("/mask.png")
-    assert client.get(body["mask_url"]).status_code == 200
-    assert client.get(body["comparison_url"]).status_code == 200
+    assert body["mask_url"].startswith("data:image/")
+    assert body["comparison_url"].startswith("data:image/")
 
 
 def test_fourier_api_on_sample():
@@ -149,7 +148,7 @@ def test_fourier_api_on_sample():
     assert res.status_code == 200, res.text
     body = res.json()
     for key in ("filter_url", "spectrum_url", "edges_url", "regions_url"):
-        assert client.get(body[key]).status_code == 200
+        assert body[key].startswith("data:image/")
 
 
 def test_comparison_report_endpoint():

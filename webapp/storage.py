@@ -6,6 +6,7 @@ directory is cleared, which happens on every fresh deploy.
 
 from __future__ import annotations
 
+import base64
 import json
 import os
 import sys
@@ -63,11 +64,35 @@ def as_array(points, shape_msg: str) -> np.ndarray:
     return arr
 
 
-def write_png(path: Path, image: np.ndarray) -> None:
-    """Write a float or uint8 image (gray or BGR) as PNG."""
+def _as_uint8(image: np.ndarray) -> np.ndarray:
     arr = np.asarray(image)
     if arr.dtype != np.uint8:
         arr = np.clip(np.rint(arr), 0, 255).astype(np.uint8)
+    return arr
+
+
+def write_png(path: Path, image: np.ndarray) -> None:
+    """Write a float or uint8 image (gray or BGR) as PNG."""
+    arr = _as_uint8(image)
     path.parent.mkdir(parents=True, exist_ok=True)
     if not cv2.imwrite(str(path), arr):
         raise RuntimeError(f"Could not write {path}")
+
+
+def data_url(image: np.ndarray, kind: str = "png") -> str:
+    """Encode an image so the browser can show it without a second request.
+
+    The hosted app runs each request on its own copy of the server, so a file
+    written during one call is gone when the page asks for it later.
+    """
+    arr = _as_uint8(image)
+    if kind == "jpg":
+        ok, buf = cv2.imencode(".jpg", arr, [int(cv2.IMWRITE_JPEG_QUALITY), 85])
+        mime = "image/jpeg"
+    else:
+        ok, buf = cv2.imencode(".png", arr)
+        mime = "image/png"
+    if not ok:
+        raise RuntimeError("Could not encode image")
+    payload = base64.b64encode(buf.tobytes()).decode("ascii")
+    return f"data:{mime};base64,{payload}"

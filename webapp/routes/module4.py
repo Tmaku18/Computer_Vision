@@ -13,7 +13,7 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
-from webapp.storage import DATA_DIR, IMAGE_DIR, MAX_FILE_BYTES, RESULT_DIR, ROOT, read_image, safe_id, write_png
+from webapp.storage import DATA_DIR, IMAGE_DIR, MAX_FILE_BYTES, RESULT_DIR, ROOT, data_url, read_image, safe_id, write_png
 
 import cv_core  # noqa: E402
 import fourier_segmentation  # noqa: E402
@@ -235,23 +235,16 @@ async def segment(req: SegmentRequest):
         if reference is not None:
             metrics = segment_core.compare_masks(result["mask"], reference)
             comparison = segment_core.comparison_overlay(image, result["mask"], reference)
-        result_id = uuid.uuid4().hex[:12]
-        folder = RESULT_DIR / result_id
-        write_png(folder / "mask.png", result["mask"])
-        write_png(folder / "overlay.png", result["overlay"])
-        if comparison is not None:
-            write_png(folder / "comparison.png", comparison)
         payload = {
-            "id": result_id,
             "source": source,
             "method": result["method"],
             "width": int(image.shape[1]),
             "height": int(image.shape[0]),
             "box": result["box"],
             "metrics": metrics,
-            "mask_url": f"/api/m4/results/{result_id}/mask.png",
-            "overlay_url": f"/api/m4/results/{result_id}/overlay.png",
-            "comparison_url": None if comparison is None else f"/api/m4/results/{result_id}/comparison.png",
+            "mask_url": data_url(result["mask"]),
+            "overlay_url": data_url(result["overlay"], "jpg"),
+            "comparison_url": None if comparison is None else data_url(comparison, "jpg"),
         }
         return payload
 
@@ -277,14 +270,8 @@ async def fourier(req: FourierRequest):
         result = fourier_segmentation.apply_filter(
             image, req.kind, cutoff=req.cutoff, order=req.order, sigma1=req.sigma1, sigma2=req.sigma2,
         )
-        result_id = uuid.uuid4().hex[:12]
-        folder = RESULT_DIR / result_id
-        urls = {}
-        for name in FOURIER_FILES:
-            write_png(folder / f"{name}.png", result[name])
-            urls[f"{name}_url"] = f"/api/m4/results/{result_id}/{name}.png"
+        urls = {f"{name}_url": data_url(result[name]) for name in FOURIER_FILES}
         urls.update({
-            "id": result_id,
             "source": source,
             "kind": req.kind,
             "width": int(image.shape[1]),
