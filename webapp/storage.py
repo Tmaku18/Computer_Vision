@@ -18,7 +18,7 @@ from fastapi import HTTPException
 
 ROOT = Path(__file__).resolve().parent.parent
 WEB_DIR = Path(__file__).resolve().parent
-for _folder in ("HW1", "HW2", "HW3"):
+for _folder in ("HW1", "HW2", "HW3", "HW5"):
     _path = str(ROOT / _folder)
     if _path not in sys.path:
         sys.path.insert(0, _path)

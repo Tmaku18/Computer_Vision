@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Room length, width, and height</h1>
+<p class="lead">
+  Pause against the rail, slide the measured distance, and pause again.
+  One clip faces the long wall (that span is the room length). The other faces the short wall (the width).
+  Both measure the height. Full videos are processed on your computer; this page takes the two still frames, or shows a synthetic room.
+</p>
+<div class="workspace">
+  <div>
+    <div class="card">
+      <div class="figure-grid">
+        <figure>
+          <div class="click-stage">
+            <img alt="Left still" id="img-left">
+            <canvas id="marks"></canvas>
+          </div>
+          <figcaption>Left still. For a real wall, click bottom-left, bottom-right, top-right, top-left.</figcaption>
+        </figure>
+        <figure>
+          <img alt="Disparity" id="img-disp">
+          <figcaption>Disparity. Brighter means closer.</figcaption>
+        </figure>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Dimensions</h2>
+      <div id="stats" class="stat-grid"></div>
+      <p class="hint" id="note"></p>
+    </div>
+  </div>
+  <div class="stack">
+    <div class="card stack">
+      <h2>Synthetic room</h2>
+      <p class="hint">A 4 m × 3 m × 2.5 m box. Plane fits recover those three numbers. The disparity picture is the sample slide, so the page has an image before you film a room.</p>
+      <button type="button" id="btn-box">Show the synthetic room</button>
+    </div>
+    <div class="card stack">
+      <h2>Your two stills</h2>
+      <label class="file-drop">Left pause<input type="file" id="file-left" accept="image/*"></label>
+      <label class="file-drop">Right pause<input type="file" id="file-right" accept="image/*"></label>
+      <div class="fields">
+        <div class="field"><label for="baseline">Slide length</label><input id="baseline" type="number" value="20" step="any"></div>
+        <div class="field"><label for="unit">Unit</label>
+          <select id="unit"><option value="cm">cm</option><option value="m">m</option><option value="in">in</option></select>
+        </div>
+      </div>
+      <button type="button" id="btn-measure">Measure this wall</button>
+      <button type="button" class="secondary" id="btn-clear">Clear corners</button>
+      <div class="msg" id="msg"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script type="module" src="/static/js/room.js"></script>
+{% endblock %}

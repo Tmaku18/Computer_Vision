@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Object size from a sideways slide</h1>
+<p class="lead">
+  The phone does not turn. It slides a distance \(B\) you measure with a ruler.
+  A point that moves \(d\) pixels between the two photos is at depth \(Z = f B / d\).
+  The size is the distance between those 3D points.
+</p>
+<div class="workspace">
+  <div>
+    <div class="card">
+      <div class="figure-grid">
+        <figure>
+          <div class="click-stage">
+            <img alt="Left view" id="img-left">
+            <canvas id="marks"></canvas>
+          </div>
+          <figcaption>Left view. Click corners in order around the outline.</figcaption>
+        </figure>
+        <figure>
+          <img alt="Right view" id="img-right">
+          <figcaption>Right view. Matches are found along the same row.</figcaption>
+        </figure>
+      </div>
+      <p class="hint" id="click-count">No points yet.</p>
+    </div>
+    <div class="card">
+      <h2>Result</h2>
+      <div id="stats" class="stat-grid"></div>
+      <div id="edges"></div>
+      <p class="hint" id="gap"></p>
+    </div>
+  </div>
+  <div class="stack">
+    <div class="card stack">
+      <h2>Pair</h2>
+      <p class="hint" id="source-note">The built-in pair is a flat textured plane, shifted by a known amount.</p>
+      <label class="file-drop">Left photo<input type="file" id="file-left" accept="image/*"></label>
+      <label class="file-drop">Right photo<input type="file" id="file-right" accept="image/*"></label>
+      <button type="button" id="btn-sample">Use the sample pair</button>
+      <button type="button" class="secondary" id="btn-guides">Use the guide points</button>
+    </div>
+    <div class="card stack">
+      <h2>What to measure</h2>
+      <div class="field">
+        <label for="shape">Shape</label>
+        <select id="shape">
+          <option value="rectangle">Rectangle — 4 corners, width and height</option>
+          <option value="circle">Circle — 5 or more rim points, diameter</option>
+          <option value="polygon">Other polygon — every edge</option>
+        </select>
+      </div>
+      <div class="fields">
+        <div class="field"><label for="baseline">Slide length</label><input id="baseline" type="number" value="20" min="0" step="any"></div>
+        <div class="field"><label for="unit">Unit</label>
+          <select id="unit"><option value="cm">cm</option><option value="m">m</option><option value="in">in</option><option value="mm">mm</option><option value="ft">ft</option></select>
+        </div>
+      </div>
+      <div class="fields" id="tape-rect">
+        <div class="field"><label for="tape-width">Tape width</label><input id="tape-width" type="number" step="any"></div>
+        <div class="field"><label for="tape-height">Tape height</label><input id="tape-height" type="number" step="any"></div>
+      </div>
+      <div class="field" id="tape-circle" hidden>
+        <label for="tape-diameter">Tape diameter</label><input id="tape-diameter" type="number" step="any">
+      </div>
+      <div class="row">
+        <button type="button" id="btn-measure">Measure</button>
+        <button type="button" class="secondary" id="btn-undo">Undo point</button>
+        <button type="button" class="secondary" id="btn-clear">Clear</button>
+      </div>
+      <div class="msg" id="msg"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script type="module" src="/static/js/stereo.js"></script>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Theory · calibrated stereo, and what to write by hand</h1>
+<p class="lead">
+  Part 1 may be typed. Part 2 may not: the uncalibrated derivation has to be handwritten and scanned.
+  Camera photos of the paper are not accepted. The outline and the numbers below are the raw material, not the derivation.
+</p>
+
+<div class="card">
+  <h2>1. Calibrated stereo</h2>
+  <p>
+    The same phone is used at two stops a distance \(B\) apart, with no rotation.
+    A scene point at depth \(Z\) projects to \(u\) in the left photo and to \(u - d\) in the right photo.
+    Similar triangles give
+  </p>
+  \[ \frac{d}{f} = \frac{B}{Z} \qquad\Rightarrow\qquad Z = \frac{f B}{d}. \]
+  <p>The pinhole equations then place the point in the left camera's coordinates:</p>
+  \[ X = \frac{(u - c_x) Z}{f}, \qquad Y = \frac{(v - c_y) Z}{f}. \]
+  <p>
+    The size of an edge is the distance between its two endpoints. A rectangle reports the average of each pair of opposite edges,
+    so width and height. A circle is fit in the plane of the rim points (the plane normal is the smallest singular vector of the centered points);
+    the diameter is twice that radius. Any other polygon reports every edge.
+  </p>
+  <p>
+    Differentiating the depth formula shows where the measurement is fragile:
+  </p>
+  \[ \left|\delta Z\right| \approx \frac{Z^{2}}{f B}\,\delta d. \]
+  <p>
+    A one-pixel mismatch hurts much more at a larger depth, and a longer slide (larger \(B\)) reduces it.
+    Stereo calibration, with the Module 2 intrinsics held fixed, estimates the real rotation and translation between the stops.
+    \(|T|\) should match the ruler. Rectification then puts matching points on the same row, which is why the search is one-dimensional.
+  </p>
+  <p class="hint">
+    Zhang, 2000, for the intrinsics. Hartley and Zisserman, chapters 9–12, for the two-view geometry.
+    Hirschmüller, 2008, for the semiglobal disparity map used on the room page.
+  </p>
+</div>
+
+<div class="card">
+  <h2>2. Uncalibrated stereo — write this by hand</h2>
+  <p>Do not submit this list as the derivation. Write the algebra yourself, using the numbers from the button below, and scan it.</p>
+  <ol>
+    <li>The epipolar constraint \(x'^{\top} F x = 0\). Eight point pairs determine \(F\), after Hartley normalization and the rank-2 fix.</li>
+    <li>A canonical projective reconstruction: \(P = [I \mid 0]\) and \(P' = [[e']_{\times} F \mid e']\).</li>
+    <li>Why that reconstruction does not preserve lengths, so the object size is not determined yet.</li>
+    <li>The metric upgrade: estimate one focal length (Bougnoux, square pixels, principal point at the image center), form \(E = K^{\top} F K\), factor \(E\) into \(R\) and \(t\), and set \(\|t\| = B\) or to one known length.</li>
+    <li>Triangulate the clicked points and measure, the same way as in part 1.</li>
+  </ol>
+  <p>
+    A pure sideways slide puts the epipoles at infinity. The focal length then drops out of \(F\), and Bougnoux's formula has nothing to return.
+    In that case the handwritten step should say so and use the Module 2 focal length.
+  </p>
+  <button type="button" id="btn-numbers">Compute the sample-pair numbers</button>
+  <pre id="numbers" class="hint" style="white-space:pre-wrap"></pre>
+</div>
+{% endblock %}
+{% block scripts %}
+<script type="module" src="/static/js/stereo-theory.js"></script>
+{% endblock %}

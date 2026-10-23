@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card no-print stack">
+  <h2>Report settings</h2>
+  <div class="fields">
+    <div class="field" style="flex:2"><label for="repo-url">GitHub repository</label><input type="url" id="repo-url" value="https://github.com/Tmaku18/Computer_Vision"></div>
+    <div class="field" style="flex:2"><label for="app-url">Web application</label><input type="url" id="app-url"></div>
+    <div class="field"><label for="video-url">Video (optional)</label><input type="url" id="video-url"></div>
+  </div>
+  <div class="row">
+    <button type="button" id="btn-print">Print / Save as PDF</button>
+    <span class="hint">Then, in Preview, drag the scanned derivation onto the thumbnail sidebar so it becomes the last pages.</span>
+  </div>
+</div>
+
+<article id="report">
+  <div class="card">
+    <h1>CSc 8830 Computer Vision · Assignment 7</h1>
+    <p><strong>Tanaka Makuvaza</strong> · <span id="r-date"></span></p>
+    <dl class="kv">
+      <dt>GitHub repository</dt><dd><a id="r-repo" href="https://github.com/Tmaku18/Computer_Vision">https://github.com/Tmaku18/Computer_Vision</a></dd>
+      <dt>Web application</dt><dd><a id="r-app"></a></dd>
+      <dt>Demonstration video</dt><dd><a id="r-video"></a></dd>
+      <dt>Code</dt><dd><code>HW5/stereo_core.py</code>, <code>HW5/stereo_calibrate.py</code>, <code>HW5/measure_stereo.py</code>, <code>HW5/uncalibrated_numbers.py</code>, <code>HW5/room_core.py</code>, <code>HW5/room_dimensions.py</code>, <code>HW5/calibrate_video.py</code></dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <h2>What was measured</h2>
+    <p>
+      One phone slides a known distance \(B\). Depth is \(Z = f B / d\), and an edge length is the distance between the two back-projected endpoints.
+      A rectangle reports width and height, a circle reports its diameter, and any other polygon reports every edge.
+      The table below is the built-in plane, whose true sizes are known exactly, so the implementation can be checked before real photos replace it.
+    </p>
+    <p class="hint" id="r-note"></p>
+    <table>
+      <thead><tr><th>Shape</th><th>Estimated</th><th>Truth</th></tr></thead>
+      <tbody id="r-rows"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Room</h2>
+    <p id="r-room">Computing…</p>
+    <p>
+      A real room uses two clips. The long wall's horizontal span is the length, the short wall's horizontal span is the width,
+      and the floor-to-ceiling plane distance is the height, measured once in each clip.
+      Videos are processed locally with <code>HW5/room_dimensions.py</code> because a 30-second upload does not fit the hosted request limit.
+      Video mode needs its own calibration (<code>HW5/calibrate_video.py</code>): the still-photo \(K\) does not describe a stabilized video frame.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>Uncalibrated stereo</h2>
+    <p>
+      Part 2 is handwritten. The typed theory page only lists the steps and prints numbers for one pair.
+      The scan is appended to this PDF and is the derivation that is submitted.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>References</h2>
+    <ol id="r-refs"></ol>
+  </div>
+
+  <div class="card">
+    <h2>Appendix</h2>
+    <p>Handwritten uncalibrated-stereo derivation, scanned and appended after this page.</p>
+  </div>
+</article>
+{% endblock %}
+{% block scripts %}
+<script type="module" src="/static/js/m7-report.js"></script>
+{% endblock %}

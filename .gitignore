@@ -24,3 +24,14 @@ data/
 # SAM2 is installed in its own environment. The checkpoint is about 180 MB.
 .venv-sam2/
 HW3/checkpoints/
+
+# Assignment 7 raw photos and videos. Results and the synthetic sample are kept.
+HW5/calibration/left/*
+HW5/calibration/right/*
+!HW5/calibration/left/README.txt
+!HW5/calibration/right/README.txt
+HW5/videos/*
+!HW5/videos/README.txt
+HW5/objects/*
+!HW5/objects/README.txt
+HW5/results/

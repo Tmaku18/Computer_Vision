@@ -6,6 +6,7 @@ Course assignments, with a web application that demonstrates each one.
 - **Module 2** (folder `HW1`): smartphone camera calibration, real-world 2D measurement, validation at > 2 m, two-camera theory. Guide: [`HW1/RUN_ASSIGNMENT.md`](HW1/RUN_ASSIGNMENT.md).
 - **Module 3** (folder `HW2`): image blurring with spatial filters and the matching Fourier-domain multiply. Guide: [`HW2/RUN_ASSIGNMENT.md`](HW2/RUN_ASSIGNMENT.md).
 - **Module 4** (folder `HW3`): classical human boundaries in RGB and thermal images, compared with SAM2, plus Fourier-domain edges. Guide: [`HW3/RUN_ASSIGNMENT.md`](HW3/RUN_ASSIGNMENT.md).
+- **Assignment 7** (folder `HW5`, pages under `/module7`): calibrated stereo object sizes, numbers for a handwritten uncalibrated derivation, and room dimensions from a short stereo video. Guide: [`HW5/RUN_ASSIGNMENT.md`](HW5/RUN_ASSIGNMENT.md).
 
 ## Run locally
 
@@ -27,6 +28,8 @@ Python 3.11 or newer is required. HEIC photos from an iPhone are supported throu
 | `HW1/cv_core.py` | Shared computer-vision core: calibration, undistortion, homography/pinhole measurement, error statistics |
 | `HW2/filtering_core.py` | Spatial convolution, FFT convolution, kernels, comparison metrics |
 | `HW3/segment_core.py` | GrabCut, watershed, background difference, thermal blobs, overlap metrics |
+| `HW5/stereo_core.py` | Sideways-slide stereo: depth from disparity, rectangle / circle / polygon sizes |
+| `HW5/room_core.py` | Still-frame split, scaled pose, semiglobal disparity, room planes |
 | `HW1/*.py`, `HW1/*.m` | Command-line scripts for each step, in Python (OpenCV) and MATLAB. Each has a README header explaining how to run it. |
 | `HW1/camera_calibration.json` | Calibration of the phone camera (29 photos, 2.41 px RMS), used by default in the web app |
 | `webapp/` | FastAPI backend. Pages and nav come from `pages.py`; each module has a router in `webapp/routes/` |

@@ -9,3 +9,6 @@ tests
 HW1/calibration_images
 HW1/validation_images
 HW1/*.mat
+HW5/calibration
+HW5/videos
+HW5/objects

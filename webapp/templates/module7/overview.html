@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Module 7 · Stereo sizes and a room</h1>
+<p class="lead">
+  Assignment 7 asks for the size of an object from two views, the depth first, then the size.
+  The same phone slides a measured distance between the views. A separate part is a derivation
+  you write by hand, and a third part measures a room from video.
+</p>
+<div class="grid grid-2">
+  <a class="card step-card" href="/module7/stereo">
+    <span class="num">1</span>
+    <h2>Calibrated stereo</h2>
+    <p>Click a rectangle, a circle, or another polygon. Depth comes from how far each point shifts, then the edges are real lengths.</p>
+  </a>
+  <a class="card step-card" href="/module7/room">
+    <span class="num">2</span>
+    <h2>Room from video</h2>
+    <p>Two still frames from a pause–slide–pause clip. The rail length sets the scale. The wall you face gives one side of the room, and the floor-to-ceiling gap gives the height.</p>
+  </a>
+  <a class="card step-card" href="/module7/theory">
+    <span class="num">3</span>
+    <h2>Theory</h2>
+    <p>The calibrated formulas are typed here. The uncalibrated derivation is an outline plus numbers: that part has to be handwritten and scanned.</p>
+  </a>
+  <a class="card step-card" href="/module7/report">
+    <span class="num">4</span>
+    <h2>Report</h2>
+    <p>Print this page to PDF. Append the scanned derivation in Preview.</p>
+  </a>
+</div>
+{% endblock %}

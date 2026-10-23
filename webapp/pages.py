@@ -73,6 +73,28 @@ MODULES = [
             ("/module4/report", "Report"),
         ],
     },
+    {
+        "id": "module7",
+        "prefix": "/module7",
+        "nav_label": "Module 7",
+        "card_title": "Stereo sizes and room dimensions",
+        "blurb": (
+            "Slide one calibrated phone sideways, recover depth from the disparity, and measure "
+            "a rectangle, a circle, or any polygon. Derive the uncalibrated case by hand, then "
+            "measure a room from a short stereo video."
+        ),
+        "status": "Live",
+        "folder": "HW5",
+        "steps": "Stereo · Room · Theory · Report",
+        "show_calibration_pill": False,
+        "links": [
+            ("/module7", "Module 7"),
+            ("/module7/stereo", "Stereo"),
+            ("/module7/room", "Room"),
+            ("/module7/theory", "Theory"),
+            ("/module7/report", "Report"),
+        ],
+    },
 ]
 
 # path without the leading slash -> (template, title)
@@ -94,6 +116,11 @@ PAGES = {
     "module4/fourier": ("module4/fourier.html", "Fourier edges"),
     "module4/theory": ("module4/theory.html", "Theory · Fourier segmentation"),
     "module4/report": ("module4/report.html", "Report"),
+    "module7": ("module7/overview.html", "Module 7"),
+    "module7/stereo": ("module7/stereo.html", "Stereo measurement"),
+    "module7/room": ("module7/room.html", "Room dimensions"),
+    "module7/theory": ("module7/theory.html", "Theory · Stereo"),
+    "module7/report": ("module7/report.html", "Report"),
 }
 
 
