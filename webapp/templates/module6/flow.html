@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Optical flow</h1>
+<p class="lead">
+  Farnebäck flow is drawn as a color wheel (hue is direction, brightness is speed) and as arrows.
+  Sparse corners are tracked with pyramidal Lucas–Kanade. The clips below are saved with the
+  assignment and play on the hosted site. Uploading a new video works only when this app is
+  running on your computer: the hosted server keeps nothing between requests.
+</p>
+
+<div class="workspace">
+  <div class="card">
+    <form id="flow-form" class="stack">
+      <div class="field">
+        <label for="clip">Saved clip</label>
+        <select id="clip"><option value="">No saved clip yet</option></select>
+      </div>
+      <label class="file-drop" id="drop">
+        <input type="file" id="video" accept="video/*,.mov,.mp4,.m4v">
+        <span id="file-label">Drop a video, or click to choose one</span>
+      </label>
+      <div class="fields">
+        <div class="field"><label>Start (seconds)</label><input type="number" id="start" value="0" min="0" step="0.1"></div>
+        <div class="field"><label>Duration (seconds)</label><input type="number" id="duration" value="30" min="1" max="45" step="1"></div>
+      </div>
+      <button type="submit" id="go">Compute flow</button>
+      <div class="progress" id="progress-wrap" hidden><div id="progress"></div></div>
+      <p class="msg" id="msg"></p>
+    </form>
+  </div>
+  <div class="card">
+    <h2>What the field is saying</h2>
+    <p id="interpretation" class="muted">Pick a saved clip, or run one locally. A still camera lights up only the moving objects. A moving camera lights up the whole frame, and nearer things move faster.</p>
+    <p class="small muted" id="flow-note"></p>
+    <div class="stat-grid" id="stats"></div>
+  </div>
+</div>
+
+<div class="card" id="videos" hidden>
+  <h2>Videos</h2>
+  <div class="grid grid-2" id="video-grid"></div>
+</div>
+
+<div class="grid grid-2">
+  <div class="card">
+    <h2>Mean speed</h2>
+    <canvas id="speed-chart" width="640" height="220" style="width:100%;height:auto;background:#f7f8fc;border-radius:8px"></canvas>
+  </div>
+  <div class="card">
+    <h2>Direction of the moving pixels</h2>
+    <canvas id="dir-chart" width="640" height="220" style="width:100%;height:auto;background:#f7f8fc;border-radius:8px"></canvas>
+    <img id="mask" alt="Moving-object mask" style="width:100%;margin-top:0.75rem;border-radius:8px" hidden>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="/static/js/flow.js"></script>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block head %}
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+{% endblock %}
+{% block content %}
+<h1>Four-view structure from motion</h1>
+<p class="lead">
+  Same phone, 1× lens, landscape, as the Module 2 calibration. Click the same boundary
+  points in every view, in the same order. One taped length fixes the scale. The
+  reconstruction is in meters, with view 1 at the origin.
+</p>
+
+<div class="workspace">
+  <div>
+    <div class="card">
+      <div class="tabs" id="view-tabs">
+        <button type="button" class="active" data-view="0">View 1</button>
+        <button type="button" data-view="1">View 2</button>
+        <button type="button" data-view="2">View 3</button>
+        <button type="button" data-view="3">View 4</button>
+      </div>
+      <div class="row" style="margin-bottom:0.75rem">
+        <button type="button" class="secondary" id="load-example">Load committed example</button>
+      </div>
+      <label class="file-drop"><input type="file" id="photo" accept="image/*"><span id="photo-label">Choose the photo for this view</span></label>
+      <p class="hint">Photos stay in this browser (no separate upload). Each view is shrunk to a 1600 px long edge before it is sent.</p>
+      <div class="canvas-wrap" id="wrap" style="margin-top:0.75rem"><div class="placeholder">Click corners, then points along the edges. Same order in every view.</div></div>
+      <div class="canvas-toolbar">
+        <button type="button" class="ghost" id="undo">Undo</button>
+        <span id="count">0 points</span>
+      </div>
+    </div>
+  </div>
+  <div class="card stack">
+    <h2>Scale</h2>
+    <div class="fields">
+      <div class="field"><label>Taped length</label><input type="number" id="length" value="11" min="0" step="0.01"></div>
+      <div class="field"><label>Unit</label>
+        <select id="unit"><option>in</option><option>cm</option><option>mm</option><option>m</option><option>ft</option></select>
+      </div>
+    </div>
+    <div class="fields">
+      <div class="field"><label>From point #</label><input type="number" id="edge-i" value="0" min="0" step="1"></div>
+      <div class="field"><label>To point #</label><input type="number" id="edge-j" value="1" min="0" step="1"></div>
+    </div>
+    <h3>Optional second tape measurement</h3>
+    <div class="fields">
+      <div class="field"><label>Length (same unit)</label><input type="number" id="check-length" value="0" min="0" step="0.01"></div>
+      <div class="field"><label>From #</label><input type="number" id="check-i" value="1" min="0" step="1"></div>
+      <div class="field"><label>To #</label><input type="number" id="check-j" value="2" min="0" step="1"></div>
+    </div>
+    <div class="field">
+      <label for="cameras">Measured camera positions (optional)</label>
+      <textarea id="cameras" rows="4" placeholder="One view per line, in meters: x y z"></textarea>
+    </div>
+    <button type="button" id="run">Reconstruct</button>
+    <p class="msg" id="msg"></p>
+    <p class="hint">Point numbers start at 0, in the order you clicked. The second length is only a check; it does not set the scale.</p>
+  </div>
+</div>
+
+<div class="card" id="view3d-card" hidden>
+  <h2>Cameras and boundary</h2>
+  <div id="plot" style="height:480px"></div>
+</div>
+
+<div class="grid grid-2">
+  <div class="card">
+    <h2>Intrinsics used</h2>
+    <pre class="matrix" id="k-text">The Module 2 calibration, scaled to these photos.</pre>
+    <h3>Boundary</h3>
+    <div id="edges"></div>
+  </div>
+  <div class="card">
+    <h2>Camera poses</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>View</th><th class="num">Cx (m)</th><th class="num">Cy (m)</th><th class="num">Cz (m)</th><th class="num">RMS px</th></tr></thead>
+        <tbody id="poses"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Workout</h2>
+  <pre class="matrix" id="workout">Run a reconstruction to print E, the four pose candidates, one DLT triangulation, PnP, and the bundle-adjustment errors.</pre>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="/static/js/sfm.js"></script>
+{% endblock %}

@@ -1,0 +1,115 @@
+{
+  "boundary": [
+    [
+      [
+        338.7931644746617,
+        245.12469816565985
+      ],
+      [
+        623.1878619653331,
+        245.12469816565985
+      ],
+      [
+        623.1878619653331,
+        464.8748014392452
+      ],
+      [
+        338.7931644746617,
+        464.8748014392452
+      ]
+    ],
+    [
+      [
+        367.61582707723403,
+        254.5161293184274
+      ],
+      [
+        618.3451388657522,
+        241.48311691796593
+      ],
+      [
+        615.2452249835483,
+        473.9892699855865
+      ],
+      [
+        369.7890339146501,
+        446.90213345477247
+      ]
+    ],
+    [
+      [
+        340.8867426396847,
+        239.53194279026974
+      ],
+      [
+        593.711610869868,
+        250.37702358276232
+      ],
+      [
+        590.3543749734056,
+        445.132979127717
+      ],
+      [
+        345.89939849375236,
+        480.38533427056944
+      ]
+    ],
+    [
+      [
+        354.5797832312611,
+        266.02382594304925
+      ],
+      [
+        616.19647684131,
+        247.04527340925569
+      ],
+      [
+        630.5138627821776,
+        460.24380754211523
+      ],
+      [
+        342.0286377073879,
+        465.95311389811485
+      ]
+    ]
+  ],
+  "camera_positions": [
+    {
+      "view": 1,
+      "x_m": 0.0,
+      "y_m": 0.0,
+      "z_m": 0.62,
+      "note": "true center used to render this view, poster at the origin"
+    },
+    {
+      "view": 2,
+      "x_m": 0.28,
+      "y_m": 0.04,
+      "z_m": 0.58,
+      "note": "true center used to render this view, poster at the origin"
+    },
+    {
+      "view": 3,
+      "x_m": -0.3,
+      "y_m": 0.06,
+      "z_m": 0.55,
+      "note": "true center used to render this view, poster at the origin"
+    },
+    {
+      "view": 4,
+      "x_m": 0.1,
+      "y_m": -0.18,
+      "z_m": 0.6,
+      "note": "true center used to render this view, poster at the origin"
+    }
+  ],
+  "measured": {
+    "length": 8.5,
+    "unit": "in",
+    "endpoints": [
+      1,
+      2
+    ]
+  },
+  "note": "Synthetic stand-in, not a phone recording. Replace it with the clips and photos described in HW4/videos/README.txt and HW4/sfm_images/README.txt before submitting."
+}

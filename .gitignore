@@ -35,3 +35,9 @@ HW5/videos/*
 HW5/objects/*
 !HW5/objects/README.txt
 HW5/results/
+
+# Module 6 raw clips and object photos. Downscaled outputs in HW4/results are kept.
+HW4/videos/*
+!HW4/videos/README.txt
+HW4/sfm_images/*
+!HW4/sfm_images/README.txt

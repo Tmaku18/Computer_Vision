@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Theory · Flow, tracking, and structure from motion</h1>
+<p class="lead">
+  Derivations used by the flow, tracking, and structure-from-motion pages.
+  References are at the bottom.
+</p>
+
+<div class="card theory">
+  <h2>1. Brightness constancy</h2>
+  <p>
+    A small patch of surface looks the same in two nearby frames. If a point at
+    \((x, y)\) moves by \((u, v)\) pixels between frame \(t\) and frame \(t+1\),
+  </p>
+  \[
+    I(x+u,\, y+v,\, t+1) = I(x, y, t).
+  \]
+  <p>
+    Taylor-expand the left side around \((x, y, t)\) and drop the higher-order terms:
+  </p>
+  \[
+    I + I_x u + I_y v + I_t \approx I
+    \quad\Rightarrow\quad
+    I_x u + I_y v + I_t = 0.
+  \]
+  <p>
+    \(I_x\) and \(I_y\) are spatial derivatives, \(I_t\) is the frame difference, and
+    \((u, v)\) is the unknown motion. This is one equation in two unknowns. Any
+    \((u, v)\) that differs by a slide <em>along</em> the image edge still satisfies it.
+    That is the aperture problem: a window that only sees an edge cannot tell motion
+    along the edge from no motion at all.
+  </p>
+
+  <h2>2. Lucas–Kanade</h2>
+  <p>
+    Lucas and Kanade assume the motion is constant inside a small window and stack
+    one brightness equation per pixel. With \(A\) the matrix whose rows are
+    \((I_x, I_y)\) and \(b = -I_t\),
+  </p>
+  \[
+    A \begin{bmatrix} u \\ v \end{bmatrix} = b,
+    \qquad
+    (A^\top A)\begin{bmatrix} u \\ v \end{bmatrix} = A^\top b.
+  \]
+  <p>
+    The \(2\times 2\) matrix \(A^\top A\) is the structure tensor of the window:
+  </p>
+  \[
+    A^\top A = \sum \begin{bmatrix} I_x^2 & I_x I_y \\ I_x I_y & I_y^2 \end{bmatrix}.
+  \]
+  <p>
+    Its eigenvalues say whether the window can be tracked. Two large eigenvalues: a
+    corner, and \((u, v)\) is determined. One large and one tiny: an edge, and only
+    the component across the edge is determined. Both tiny: a flat patch, and the
+    equations have no information.
+  </p>
+  <p>
+    The linearization is only good for a fraction of a pixel, so the step is repeated.
+    That repetition is Gauss–Newton on the sum of squared brightness differences.
+    A coarse-to-fine pyramid (Bouguet) lets the same small-motion solver handle
+    displacements of several pixels: solve on a downsampled pair, double the
+    displacement, and refine on the next finer level.
+  </p>
+
+  <h2>3. The same idea as minimizing SSD</h2>
+  <p>
+    For two frames the quantity being minimized is the sum of squared differences
+  </p>
+  \[
+    E(u, v) = \sum_{x, y \in W} \big(I_2(x+u, y+v) - I_1(x, y)\big)^2.
+  \]
+  <p>
+    Differentiating and setting the derivatives to zero, then replacing the
+    derivatives of \(I_2\) by the derivatives of the template, gives the same
+    normal equations. Each Gauss–Newton step solves them and adds \((\Delta u, \Delta v)\)
+    to the running displacement. The tracking page prints one such step on a
+    \(5\times 5\) window: the intensities, \(I_x\), \(I_y\), \(A^\top A\), \(A^\top b\),
+    and the solution.
+  </p>
+
+  <h2>4. Bilinear interpolation</h2>
+  <p>
+    The displacement is not an integer, so \(I_2(x+u, y+v)\) has to be read between
+    pixels. Let \(x_0 = \lfloor x \rfloor\), \(a = x - x_0\), and likewise \(y_0\) and
+    \(b\). Interpolate in \(x\) on each of the two rows, then in \(y\) between those
+    results:
+  </p>
+  \[
+    \begin{aligned}
+    I(x, y_0) &= (1-a)\,I_{00} + a\,I_{10}, \\
+    I(x, y_0+1) &= (1-a)\,I_{01} + a\,I_{11}, \\
+    I(x, y) &= (1-b)\,I(x, y_0) + b\,I(x, y_0+1).
+    \end{aligned}
+  \]
+  <p>Collecting terms,</p>
+  \[
+    I(x, y) = (1-a)(1-b)\,I_{00} + a(1-b)\,I_{10} + (1-a)b\,I_{01} + ab\,I_{11}.
+  \]
+  <p>
+    On an image that is itself a linear ramp, \(I = c_0 + c_1 x + c_2 y\), this
+    formula is exact. The unit test checks that identity.
+  </p>
+
+  <h2>5. Structure from motion</h2>
+  <p>
+    A 3D point \(X\) seen by two calibrated cameras projects to pixels \(x\) and \(x'\).
+    With the first camera at the origin, the second is a rotation \(R\) and a
+    translation \(t\), and the two rays and the baseline are coplanar:
+  </p>
+  \[
+    \tilde{x}'^{\top} E \tilde{x} = 0, \qquad E = [t]_{\times} R.
+  \]
+  <p>
+    \(E\) is the essential matrix. Its SVD \(E = U \operatorname{diag}(1, 1, 0) V^{\top}\)
+    produces four candidates \((R, t)\), from the two ways to build a rotation with
+    the matrix \(W\) and from the sign of \(t = U_{:3}\). Triangulating the points and
+    keeping the candidate that puts them in front of both cameras (positive depth,
+    cheirality) selects one.
+  </p>
+  <p>
+    A point observed only on a plane does not determine \(E\) uniquely: many essential
+    matrices share the same correspondences. The object in this assignment is flat, so
+    the two-view pose is taken from the homography instead,
+    \(H = K (R + t n^{\top}/d) K^{-1}\), which decomposes into four poses of its own.
+    Cheirality again picks one. The workout still forms \(E = [t]_{\times} R\) for
+    that pose and prints the SVD, so the essential-matrix algebra is visible with the
+    numbers that the reconstruction actually used. <code>findEssentialMat</code> is run
+    as well; its inlier count is reported next to the homography pose.
+  </p>
+  <p>
+    Linear triangulation writes the cross product \(\tilde{x} \times P X = 0\) as two
+    rows per camera and solves the resulting \(4\times 4\) system by SVD. That is the
+    DLT block in the workout. Views 3 and 4 are then attached by PnP: the already
+    triangulated points are 3D–2D correspondences, and <code>solvePnP</code> returns
+    each new \((R, t)\).
+  </p>
+  <p>
+    Bundle adjustment treats every camera (except the first, which stays at the origin)
+    and every 3D point as unknowns and minimizes the sum of squared reprojection errors
+    with Levenberg–Marquardt. Reprojection is unchanged if all points and all
+    translations are multiplied by the same constant, so the reconstruction has no
+    absolute size. One tape-measured edge supplies that scale. The boundary points are
+    then projected onto their best-fit plane (the smallest singular vector of the
+    centered points) and connected into a polygon whose edge lengths and area can be
+    compared with the tape.
+  </p>
+  <p>
+    Camera centers in the first camera’s frame are \(C = -R^{\top} t\), in meters
+    after scaling.
+  </p>
+
+  <h2>References</h2>
+  <ol>
+    <li>B. D. Lucas and T. Kanade, “An iterative image registration technique with an application to stereo vision,” <em>Proc. IJCAI</em>, 1981.</li>
+    <li>B. K. P. Horn and B. G. Schunck, “Determining optical flow,” <em>Artificial Intelligence</em>, 1981.</li>
+    <li>G. Farnebäck, “Two-frame motion estimation based on polynomial expansion,” <em>SCIA</em>, 2003.</li>
+    <li>J.-Y. Bouguet, “Pyramidal implementation of the affine Lucas Kanade feature tracker,” Intel Corporation, Microprocessor Research Labs, 2001.</li>
+    <li>D. G. Lowe, “Distinctive image features from scale-invariant keypoints,” <em>IJCV</em>, 2004. (SIFT)</li>
+    <li>R. Hartley and A. Zisserman, <em>Multiple View Geometry in Computer Vision</em>, 2nd ed., Cambridge, 2004. Essential-matrix decomposition, triangulation, bundle adjustment.</li>
+    <li>R. Szeliski, <em>Computer Vision: Algorithms and Applications</em>, 2nd ed., Springer, 2022. Chapters on motion and structure from motion.</li>
+    <li>OpenCV documentation: <code>calcOpticalFlowFarneback</code>, <code>calcOpticalFlowPyrLK</code>, <code>findEssentialMat</code>, <code>recoverPose</code>, <code>findHomography</code>, <code>decomposeHomographyMat</code>, <code>triangulatePoints</code>, <code>solvePnP</code>.</li>
+  </ol>
+</div>
+{% endblock %}

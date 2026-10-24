@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Module 6 · Optical flow, tracking, and structure from motion</h1>
+<p class="lead">
+  Compute how every pixel moves in two short videos, derive Lucas–Kanade and bilinear
+  interpolation and check them on real frame pairs, then reconstruct a flat object
+  from four photographs using the Module 2 camera calibration.
+</p>
+
+<div class="grid grid-3">
+  <a class="card step-card" href="/module6/flow">
+    <span class="num">Part 1</span>
+    <h2>Optical flow</h2>
+    <p>Farnebäck dense flow, arrow and color-wheel videos, sparse trails, and what the motion field says about the scene.</p>
+  </a>
+  <a class="card step-card" href="/module6/tracking">
+    <span class="num">Part 1</span>
+    <h2>Tracking check</h2>
+    <p>Click corners in two frames. The from-scratch tracker, OpenCV, and template matching are scored against your clicks.</p>
+  </a>
+  <a class="card step-card" href="/module6/sfm">
+    <span class="num">Part 2</span>
+    <h2>Structure from motion</h2>
+    <p>Four views of one flat object. Camera poses, a scaled boundary, and the algebra written out with your numbers.</p>
+  </a>
+  <a class="card step-card" href="/module6/theory">
+    <span class="num">Theory</span>
+    <h2>Derivations</h2>
+    <p>Brightness constancy, the aperture problem, Lucas–Kanade, bilinear interpolation, and the SfM chain from E to bundle adjustment.</p>
+  </a>
+  <a class="card step-card" href="/module6/report">
+    <span class="num">Report</span>
+    <h2>Printable report</h2>
+    <p>Flow charts, tracking errors, the four views with camera positions, the workout, and the references.</p>
+  </a>
+</div>
+
+<div class="card">
+  <h2>What you still do by hand</h2>
+  <ol>
+    <li>Record two clips, about 30 s each, 1080p at 30 fps. One with the phone still (people or cars moving), one while you walk or pan. Trim them in Photos before uploading.</li>
+    <li>On the tracking page, click about 10 sharp corners in frame 1, then click where those same corners actually are in frame 2.</li>
+    <li>Photograph one flat textured object (a book cover, a poster, a box face) from 4 viewpoints, same phone, 1× lens, landscape, so the Module 2 calibration applies. Tape-measure the width and height, and jot down roughly where you stood.</li>
+    <li>Click the same corners and edge points, in the same order, in all four photos. One length sets the scale; the other checks it.</li>
+  </ol>
+  <p class="small">
+    The same programs run from the command line in
+    <a href="https://github.com/Tmaku18/Computer_Vision/tree/main/HW4" target="_blank" rel="noopener"><code>HW4/</code></a>.
+    The step-by-step commands are in <code>HW4/RUN_ASSIGNMENT.md</code>.
+  </p>
+</div>
+{% endblock %}

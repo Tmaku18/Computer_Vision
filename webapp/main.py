@@ -10,6 +10,7 @@ WHAT THIS IS
     Module 2 (HW1)  camera calibration, 2D measurement, validation, two-camera theory
     Module 3 (HW2)  image blurring in space and in the Fourier domain
     Module 4 (HW3)  classical human outlines in RGB and thermal images, compared with SAM2
+    Module 6 (HW4)  optical flow, Lucas–Kanade tracking, four-view planar structure from motion
     Module 7 (HW5)  calibrated stereo sizes, an uncalibrated derivation, room dimensions from video
 
 HOW TO RUN LOCALLY (from the repository root)
@@ -34,6 +35,7 @@ from webapp.pages import register_pages
 from webapp.routes.module2 import router as module2_router
 from webapp.routes.module3 import router as module3_router
 from webapp.routes.module4 import router as module4_router
+from webapp.routes.module6 import router as module6_router
 from webapp.routes.module7 import router as module7_router
 from webapp.storage import WEB_DIR
 
@@ -44,4 +46,5 @@ register_pages(app, templates)
 app.include_router(module2_router)
 app.include_router(module3_router)
 app.include_router(module4_router)
+app.include_router(module6_router)
 app.include_router(module7_router)

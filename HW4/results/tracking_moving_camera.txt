@@ -1,0 +1,46 @@
+From-scratch Lucas–Kanade vs clicked frame 2: n=10  mean=0.029px  median=0.029px  max=0.029px
+OpenCV pyramidal LK vs clicked frame 2:      n=10  mean=0.030px  median=0.030px  max=0.030px
+Template match vs clicked frame 2:           n=10  mean=22.616px  median=22.616px  max=22.616px
+
+Worked example (first Gauss–Newton step, 5×5 window):
+Point (x, y) = (600.0000, 344.0000), window 5×5
+
+Template I1 (bilinear samples of the window):
+[[159. 159.  92.  92.  92.]
+ [159. 159.  92.  92.  92.]
+ [ 92.  92. 159. 159. 159.]
+ [ 92.  92. 159. 159. 159.]
+ [ 92.  92. 159. 159. 159.]]
+
+Ix:
+[[  0.  -33.5 -33.5   0.    0. ]
+ [  0.  -33.5 -33.5   0.    0. ]
+ [  0.   33.5  33.5   0.    0. ]
+ [  0.   33.5  33.5   0.    0. ]
+ [  0.   33.5  33.5   0.    0. ]]
+
+Iy:
+[[  0.    0.    0.    0.    0. ]
+ [-33.5 -33.5  33.5  33.5  33.5]
+ [-33.5 -33.5  33.5  33.5  33.5]
+ [  0.    0.    0.    0.    0. ]
+ [  0.    0.    0.    0.    0. ]]
+
+I2 at the same window (first iteration, zero displacement):
+[[ 93.  93.  92.  92.  92.]
+ [ 93.  93.  92.  92.  92.]
+ [ 89.  89.  89.  89.  89.]
+ [125. 125. 125. 125. 125.]
+ [159. 159. 159. 159. 159.]]
+
+AᵀA =
+[[11222.5     0. ]
+ [    0.  11222.5]]
+Aᵀb = [-4187.5  2412. ]
+eigenvalues of AᵀA (small, large) = 11222.500000, 11222.500000
+solve (AᵀA) [u, v]ᵀ = Aᵀb  →  (u, v) = (-0.373134, 0.214925)
+
+Bilinear lookup of I1 at the point itself:
+  floor = (600, 344), a = 0.000000, b = 0.000000
+  I00 = 159.0000  I10 = 159.0000  I01 = 159.0000  I11 = 159.0000
+  (1-a)(1-b)I00 + a(1-b)I10 + (1-a)b I01 + ab I11 = 159.000000

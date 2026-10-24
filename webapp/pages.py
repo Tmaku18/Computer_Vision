@@ -74,6 +74,28 @@ MODULES = [
         ],
     },
     {
+        "id": "module6",
+        "prefix": "/module6",
+        "nav_label": "Module 6",
+        "card_title": "Optical flow, tracking, and structure from motion",
+        "blurb": (
+            "Dense flow on two videos, a from-scratch Lucas–Kanade check against clicked points, "
+            "and a four-view reconstruction of a planar object."
+        ),
+        "status": "Live",
+        "folder": "HW4",
+        "steps": "Flow · Tracking · SfM · Theory · Report",
+        "show_calibration_pill": False,
+        "links": [
+            ("/module6", "Module 6"),
+            ("/module6/flow", "Flow"),
+            ("/module6/tracking", "Tracking"),
+            ("/module6/sfm", "SfM"),
+            ("/module6/theory", "Theory"),
+            ("/module6/report", "Report"),
+        ],
+    },
+    {
         "id": "module7",
         "prefix": "/module7",
         "nav_label": "Module 7",
@@ -116,6 +138,12 @@ PAGES = {
     "module4/fourier": ("module4/fourier.html", "Fourier edges"),
     "module4/theory": ("module4/theory.html", "Theory · Fourier segmentation"),
     "module4/report": ("module4/report.html", "Report"),
+    "module6": ("module6/overview.html", "Module 6"),
+    "module6/flow": ("module6/flow.html", "Optical flow"),
+    "module6/tracking": ("module6/tracking.html", "Tracking"),
+    "module6/sfm": ("module6/sfm.html", "Structure from motion"),
+    "module6/theory": ("module6/theory.html", "Theory · Flow and SfM"),
+    "module6/report": ("module6/report.html", "Report"),
     "module7": ("module7/overview.html", "Module 7"),
     "module7/stereo": ("module7/stereo.html", "Stereo measurement"),
     "module7/room": ("module7/room.html", "Room dimensions"),

@@ -1,0 +1,69 @@
+Essential matrix E (views 1–2):
+[[-0.042979 -0.2126    0.089036]
+ [-0.093118  0.041289  0.694484]
+ [-0.094854 -0.665842 -0.000019]]
+
+SVD E = U diag(S) Vᵀ
+S = [7.071068e-01 7.071068e-01 3.084537e-17]
+U =
+[[-0.123661  0.30766   0.943426]
+ [ 0.735564  0.66657  -0.120959]
+ [-0.666074  0.678992 -0.308732]]
+Vᵀ =
+[[ 0.        0.707334  0.70688 ]
+ [-0.197563 -0.692948  0.693392]
+ [ 0.98029  -0.139653  0.139743]]
+
+Four (R, t) candidates and how many points land in front of both cameras:
+  candidate 1: in front = 0, t = [ 0.9434 -0.121  -0.3087]
+  R =
+[[ 0.9004  0.0002  0.4351]
+ [ 0.0267  0.9981 -0.0558]
+ [-0.4342  0.0618  0.8987]]
+  candidate 2: in front = 412, t = [-0.9434  0.121   0.3087]
+  R =
+[[ 0.9004  0.0002  0.4351]
+ [ 0.0267  0.9981 -0.0558]
+ [-0.4342  0.0618  0.8987]]
+  candidate 3: in front = 0, t = [ 0.9434 -0.121  -0.3087]
+  R =
+[[ 0.9493 -0.2637 -0.1714]
+ [-0.2639 -0.9643  0.0219]
+ [-0.1711  0.0244 -0.985 ]]
+  candidate 4: in front = 0, t = [-0.9434  0.121   0.3087]
+  R =
+[[ 0.9493 -0.2637 -0.1714]
+ [-0.2639 -0.9643  0.0219]
+ [-0.1711  0.0244 -0.985 ]]
+
+DLT triangulation of boundary point index 408.
+Design matrix A (4×4), from the two images and P, P':
+[[-626.881     0.     -141.2504    0.    ]
+ [   0.     -626.8541 -109.1434    0.    ]
+ [-515.4655   -7.0842 -374.0949  256.6294]
+ [  26.6446 -631.836   -54.8892  -49.1903]]
+Smallest right singular vector (homogeneous X) = [ 0.156175  0.120725 -0.693095 -0.693293]
+Cartesian point before the tape-measure scale = [-0.225266 -0.174132  0.999715]
+
+PnP pose of view 3 (before bundle adjustment), R and t:
+[[ 0.877902 -0.000235 -0.47884 ]
+ [-0.045435  0.995447 -0.08379 ]
+ [ 0.47668   0.095316  0.873894]]
+t = [0.478849 0.083823 0.140966]
+
+Bundle adjustment reprojection RMS: 1.684917e-01 px before, 1.187273e-01 px after.
+Per-view RMS after scaling (px): [0.0781 0.1355 0.1223 0.1302]
+Scale applied so the taped edge equals 0.279400 m: s = 0.197494
+
+The two-view pose is the homography decomposition (the object is planar, so the
+essential matrix is not unique). E above is [t]× R for that pose.
+findEssentialMat inliers on the same correspondences: 412.
+
+Camera centers in meters, relative to view 1 (C = -Rᵀ t):
+  view 1: [0. 0. 0.] m
+  view 2: [ 0.2799 -0.04    0.0399] m
+  view 3: [-0.3002 -0.0599  0.0702] m
+  view 4: [0.1001 0.1802 0.02  ] m
+
+Boundary edge lengths (m): 0.2794, 0.2159, 0.2794, 0.2159
+Boundary area (m²): 0.060316

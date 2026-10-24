@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Module 6 report</h1>
+<p class="lead no-print">
+  The numbers below come from the results saved with the assignment, so this page matches
+  the repository on the hosted site. A run you just finished in this browser is added
+  underneath. Use Print and choose Save as PDF. Fill in the links before you print.
+</p>
+
+<div class="card no-print">
+  <div class="fields">
+    <div class="field"><label>GitHub</label><input type="url" id="gh" placeholder="https://github.com/..."></div>
+    <div class="field"><label>App</label><input type="url" id="app" placeholder="https://..."></div>
+    <div class="field"><label>Demo video</label><input type="url" id="video" placeholder="https://..."></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Links</h2>
+  <p id="links" class="small">Add the GitHub, app, and video links above. They are saved in this browser.</p>
+</div>
+
+<div class="card">
+  <h2>Optical flow</h2>
+  <div id="flow-body"><p class="muted">No flow clip yet. Run one on the Optical flow page.</p></div>
+</div>
+
+<div class="card">
+  <h2>Tracking</h2>
+  <div id="track-body"><p class="muted">No tracking check yet.</p></div>
+</div>
+
+<div class="card">
+  <h2>Structure from motion</h2>
+  <div id="sfm-views" class="grid grid-2"></div>
+  <div id="sfm-body"><p class="muted">No reconstruction yet. The four views, camera positions, intrinsics, and the workout will appear here.</p></div>
+</div>
+
+<div class="card" id="local-card" hidden>
+  <h2>Latest run in this browser</h2>
+  <div id="local-body"></div>
+</div>
+
+<div class="card theory">
+  <h2>References</h2>
+  <ol>
+    <li>B. D. Lucas and T. Kanade, “An iterative image registration technique with an application to stereo vision,” Proc. IJCAI, 1981.</li>
+    <li>B. K. P. Horn and B. G. Schunck, “Determining optical flow,” Artificial Intelligence, 1981.</li>
+    <li>G. Farnebäck, “Two-frame motion estimation based on polynomial expansion,” SCIA, 2003.</li>
+    <li>J.-Y. Bouguet, “Pyramidal implementation of the affine Lucas Kanade feature tracker,” Intel Corporation, 2001.</li>
+    <li>D. G. Lowe, “Distinctive image features from scale-invariant keypoints,” IJCV, 2004.</li>
+    <li>R. Hartley and A. Zisserman, Multiple View Geometry in Computer Vision, 2nd ed., Cambridge, 2004.</li>
+    <li>R. Szeliski, Computer Vision: Algorithms and Applications, 2nd ed., Springer, 2022.</li>
+    <li>OpenCV documentation for <code>calcOpticalFlowFarneback</code>, <code>calcOpticalFlowPyrLK</code>, <code>findEssentialMat</code>, <code>recoverPose</code>, <code>decomposeHomographyMat</code>, and <code>solvePnP</code>.</li>
+    <li>P. Virtanen et al., “SciPy 1.0,” Nature Methods, 2020. Bundle adjustment uses <code>scipy.optimize.least_squares</code>.</li>
+    <li>imageio and imageio-ffmpeg encode the flow videos as H.264 so a browser can play them. The committed outputs under <code>HW4/results/</code> are what this report shows.</li>
+  </ol>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="/static/js/m6-report.js"></script>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Two-frame tracking</h1>
+<p class="lead">
+  Click sharp corners in frame 1. The page predicts where they go with a from-scratch
+  Lucas–Kanade tracker (gradients, the 2×2 structure tensor, Gauss–Newton) and with
+  OpenCV’s pyramidal tracker. Click the true locations in frame 2, using the loupe,
+  and the error table updates. Template matching is the cross-check.
+</p>
+
+<div class="card no-print">
+  <div class="stack">
+    <div class="field">
+      <label for="pair">Saved pair</label>
+      <select id="pair"><option value="">Choose a saved pair</option></select>
+    </div>
+    <p class="hint">Saved pairs are the frames committed with the assignment. A video or two images from this computer are shrunk in the browser and sent with the request, so the check also works on the hosted site.</p>
+    <div class="fields">
+      <div class="field"><label>Video (two consecutive frames)</label><input type="file" id="video" accept="video/*,.mov,.mp4"></div>
+      <div class="field"><label>Time of frame 1 (s)</label><input type="number" id="time" value="1" min="0" step="0.1"></div>
+    </div>
+    <div class="fields">
+      <div class="field"><label>Or frame 1 image</label><input type="file" id="img-a" accept="image/*"></div>
+      <div class="field"><label>Frame 2 image</label><input type="file" id="img-b" accept="image/*"></div>
+    </div>
+    <div class="row">
+      <button type="button" id="load">Load frames</button>
+      <button type="button" class="secondary" id="predict" disabled>Predict motion</button>
+      <button type="button" class="ghost" id="undo">Undo click</button>
+    </div>
+    <p class="msg" id="msg"></p>
+  </div>
+</div>
+
+<div class="grid grid-2">
+  <div class="card">
+    <h2>Frame 1 · click corners</h2>
+    <div class="canvas-wrap" id="wrap1"><div class="placeholder">Load two frames</div></div>
+    <p class="hint">Wheel to zoom. The loupe is the magnified patch under the cursor.</p>
+  </div>
+  <div class="card">
+    <h2>Frame 2 · click where they actually are</h2>
+    <div class="canvas-wrap" id="wrap2"><div class="placeholder">Predictions show up here</div></div>
+    <p class="hint">
+      <span class="legend-dot" style="background:#2952cc"></span> your clicks
+      <span class="legend-dot" style="background:#e5484d"></span> from-scratch LK
+      <span class="legend-dot" style="background:#f5a524"></span> OpenCV LK
+    </p>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Errors (pixels)</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>#</th><th class="num">Scratch</th><th class="num">OpenCV</th><th class="num">Template</th><th class="num">λ min</th><th class="num">λ max</th></tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+  <p class="small muted" id="summary"></p>
+</div>
+
+<div class="card">
+  <h2>Worked example</h2>
+  <p class="hint">First Gauss–Newton step on a 5×5 window at the selected point. The positions in the table come from the iterated tracker.</p>
+  <pre class="matrix" id="workout">Load frames and predict a point.</pre>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="/static/js/tracking.js"></script>
+{% endblock %}
