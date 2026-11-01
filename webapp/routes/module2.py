@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import base64
 import json
 import time
 import uuid
@@ -79,6 +80,28 @@ def _thumbnail(img: np.ndarray, corners: np.ndarray | None, pattern, found: bool
 def _check_unit(unit: str) -> None:
     if unit not in cv_core.UNIT_TO_METERS:
         raise HTTPException(400, f"Unknown unit '{unit}'. Use one of {sorted(cv_core.UNIT_TO_METERS)}.")
+
+
+def _image_size(image_id: str | None, width_px: int | None, height_px: int | None) -> tuple[int, int]:
+    """Prefer the size the browser already has. A stored id only works on one server."""
+    if width_px and height_px:
+        return int(width_px), int(height_px)
+    if image_id:
+        meta = image_meta(image_id)
+        return int(meta["width"]), int(meta["height"])
+    raise HTTPException(400, "Upload the photo again.")
+
+
+def _image_pixels(image_id: str | None, image_b64: str | None) -> np.ndarray:
+    if image_b64:
+        try:
+            raw = base64.b64decode(image_b64)
+            return cv_core.load_image(raw)
+        except Exception as exc:
+            raise HTTPException(400, "Could not read that photo. Use a JPEG or PNG.") from exc
+    if image_id:
+        return read_image(image_id)
+    raise HTTPException(400, "Upload the photo again.")
 
 
 @router.get("/api/health")
@@ -217,7 +240,8 @@ def get_image(image_id: str):
 
 
 class CheckerboardReferenceRequest(BaseModel):
-    image_id: str
+    image_id: str | None = None
+    image_b64: str | None = None
     calibration_id: str = DEFAULT_CALIBRATION_ID
     pattern: tuple[int, int] = (9, 6)
     square_size: float = Field(1.0, gt=0)
@@ -225,7 +249,9 @@ class CheckerboardReferenceRequest(BaseModel):
 
 
 class RectangleReferenceRequest(BaseModel):
-    image_id: str
+    image_id: str | None = None
+    width_px: int | None = None
+    height_px: int | None = None
     calibration_id: str = DEFAULT_CALIBRATION_ID
     corners: list[list[float]]
     width: float = Field(gt=0)
@@ -237,7 +263,7 @@ class RectangleReferenceRequest(BaseModel):
 async def reference_checkerboard(req: CheckerboardReferenceRequest):
     _check_unit(req.unit)
     calib = _load_calibration(req.calibration_id)
-    img = read_image(req.image_id)
+    img = _image_pixels(req.image_id, req.image_b64)
     try:
         ref = await run_in_threadpool(
             cv_core.reference_from_checkerboard, img, calib, tuple(req.pattern), req.square_size, req.unit
@@ -251,11 +277,11 @@ async def reference_checkerboard(req: CheckerboardReferenceRequest):
 def reference_rectangle(req: RectangleReferenceRequest):
     _check_unit(req.unit)
     calib = _load_calibration(req.calibration_id)
-    meta = image_meta(req.image_id)
+    width_px, height_px = _image_size(req.image_id, req.width_px, req.height_px)
     corners = as_array(req.corners, "corners must be a list of [u, v] pairs.")
     try:
         ref = cv_core.reference_from_rectangle(
-            corners, req.width, req.height, calib, (meta["width"], meta["height"]), req.unit
+            corners, req.width, req.height, calib, (width_px, height_px), req.unit
         )
     except ValueError as exc:
         raise HTTPException(400, str(exc)) from exc
@@ -268,7 +294,9 @@ class Distance(BaseModel):
 
 
 class MeasureRequest(BaseModel):
-    image_id: str
+    image_id: str | None = None
+    width_px: int | None = None
+    height_px: int | None = None
     calibration_id: str = DEFAULT_CALIBRATION_ID
     points: list[list[float]]
     closed: bool = False
@@ -283,12 +311,12 @@ def measure(req: MeasureRequest):
     if req.homography is None and req.distance is None:
         raise HTTPException(400, "Set a reference plane or a camera distance first.")
     calib = _load_calibration(req.calibration_id)
-    meta = image_meta(req.image_id)
+    width_px, height_px = _image_size(req.image_id, req.width_px, req.height_px)
     pts = as_array(req.points, "points must be a list of [u, v] pairs.")
     if pts.shape[0] < 2:
         raise HTTPException(400, "Click at least 2 points.")
     try:
-        k, dist = calib.intrinsics_for(meta["width"], meta["height"])
+        k, dist = calib.intrinsics_for(width_px, height_px)
         undist = cv_core.undistort_points(pts, k, dist)
         result = {"unit": req.unit, "undistorted": undist.tolist(), "homography": None, "pinhole": None}
         if req.homography is not None:

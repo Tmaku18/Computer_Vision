@@ -1,5 +1,27 @@
 // Photo + reference plane + camera distance controls shared by Step 2 and Step 3.
 
+async function shrinkJpeg(file, maxSide = 2000, quality = 0.85) {
+  const bitmap = await createImageBitmap(file);
+  const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+  canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+  canvas.getContext("2d").drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  const blob = await new Promise((resolve, reject) => {
+    canvas.toBlob((result) => (result ? resolve(result) : reject(new Error("Could not encode JPEG"))), "image/jpeg", quality);
+  });
+  return { blob, width: canvas.width, height: canvas.height };
+}
+
+async function blobToBase64(blob) {
+  const bytes = new Uint8Array(await blob.arrayBuffer());
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  }
+  return btoa(binary);
+}
+
 import { $, $$, UNITS, api, fmt, getActiveCalibration, setMsg, store } from "./api.js";
 import { PointPicker } from "./picker.js";
 
@@ -67,20 +89,25 @@ export class Workspace {
   }
 
   async uploadPhoto(file) {
-    this.message(`Uploading ${file.name}…`);
-    const form = new FormData();
-    form.append("file", file);
+    this.message(`Reading ${file.name}…`);
     try {
-      const meta = await api("/api/images", { form });
-      await this.picker.setImage(meta.url);
-      this.image = meta;
+      const prepared = await shrinkJpeg(file);
+      if (this.objectUrl) URL.revokeObjectURL(this.objectUrl);
+      this.objectUrl = URL.createObjectURL(prepared.blob);
+      await this.picker.setImage(this.objectUrl);
+      this.image = {
+        name: file.name,
+        width: prepared.width,
+        height: prepared.height,
+        blob: prepared.blob,
+      };
       this.clearReference();
-      $("#photo-name").textContent = `${meta.name} · ${meta.width} × ${meta.height}`;
+      $("#photo-name").textContent = `${file.name} · ${prepared.width} × ${prepared.height}`;
       this.showValidRegion();
       this.message("Photo loaded. Set a reference plane, then click points on the object.", "ok");
       this.onUpdate();
     } catch (err) {
-      this.message(err.message, "error");
+      this.message(err.message || "Could not read that photo. Export it as a JPEG and try again.", "error");
     }
   }
 
@@ -156,7 +183,7 @@ export class Workspace {
     try {
       const ref = await api("/api/reference/checkerboard", {
         json: {
-          image_id: this.image.id,
+          image_b64: await blobToBase64(this.image.blob),
           calibration_id: store.calibrationId,
           pattern: [parseInt($("#board-cols").value, 10), parseInt($("#board-rows").value, 10)],
           square_size: parseFloat($("#board-square").value),
@@ -174,7 +201,8 @@ export class Workspace {
     try {
       const ref = await api("/api/reference/rectangle", {
         json: {
-          image_id: this.image.id,
+          width_px: this.image.width,
+          height_px: this.image.height,
           calibration_id: store.calibrationId,
           corners: this.picker.points("ref"),
           width: parseFloat($("#rect-w").value),
@@ -240,7 +268,8 @@ export class Workspace {
   async measure(points, closed) {
     return api("/api/measure", {
       json: {
-        image_id: this.image.id,
+        width_px: this.image.width,
+        height_px: this.image.height,
         calibration_id: store.calibrationId,
         points,
         closed,

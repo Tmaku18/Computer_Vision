@@ -50,6 +50,18 @@ def test_measure_requires_reference_or_distance():
     assert res.status_code == 400
 
 
+def test_measure_uses_the_size_sent_with_the_request():
+    res = client.post("/api/measure", json={
+        "width_px": 1200,
+        "height_px": 900,
+        "points": [[100, 200], [400, 200]],
+        "unit": "m",
+        "distance": {"value": 2.5, "unit": "m"},
+    })
+    assert res.status_code == 200, res.text
+    assert res.json()["pinhole"]["edge_lengths"][0] > 0
+
+
 @needs_photos
 def test_checkerboard_reference_and_measurement_on_real_photo():
     path = next(p for p in PHOTOS if p.name == "IMG_5270.jpg")

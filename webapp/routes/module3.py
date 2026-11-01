@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import base64
 import json
 
 import cv2
@@ -32,6 +33,7 @@ _verify_cache: dict[str, dict] = {}
 
 class BlurRequest(BaseModel):
     image_id: str | None = None
+    image_b64: str | None = None
     kernel: str = "gaussian"
     size: int = Field(15, ge=1, le=51)
     sigma: float = Field(3.0, gt=0, le=30)
@@ -42,6 +44,7 @@ class BlurRequest(BaseModel):
 
 class VerifyRequest(BaseModel):
     image_id: str | None = None
+    image_b64: str | None = None
 
 
 class ExampleRequest(BaseModel):
@@ -49,7 +52,21 @@ class ExampleRequest(BaseModel):
     kernel: list[float] = Field(default_factory=lambda: [1, 2, 1])
 
 
-def _load(image_id: str | None, max_side: int) -> tuple[np.ndarray, str, float]:
+def _decode_b64(image_b64: str) -> np.ndarray:
+    try:
+        raw = base64.b64decode(image_b64)
+    except Exception as exc:
+        raise HTTPException(400, "Could not read that photo.") from exc
+    image = cv2.imdecode(np.frombuffer(raw, np.uint8), cv2.IMREAD_COLOR)
+    if image is None:
+        raise HTTPException(400, "Could not read that photo. Use a JPEG or PNG.")
+    return image
+
+
+def _load(image_id: str | None, max_side: int, image_b64: str | None = None) -> tuple[np.ndarray, str, float]:
+    if image_b64:
+        image, scale = downscale(_decode_b64(image_b64), max_side)
+        return image.astype(np.float64), "upload", scale
     if image_id:
         image, scale = downscale(read_image(image_id), max_side)
         return image.astype(np.float64), image_id, scale
@@ -69,7 +86,7 @@ async def blur(req: BlurRequest):
         raise HTTPException(400, "mode must be 'linear' or 'circular'.")
 
     def work():
-        image, source, scale = _load(req.image_id, req.max_side)
+        image, source, scale = _load(req.image_id, req.max_side, req.image_b64)
         try:
             kernel = make_kernel(req.kernel, req.size, req.sigma, req.angle)
         except ValueError as exc:
@@ -108,7 +125,7 @@ async def blur(req: BlurRequest):
 @router.post("/api/m3/timing")
 async def timing(req: VerifyRequest):
     def work():
-        image, source, _scale = _load(req.image_id, 128)
+        image, source, _scale = _load(req.image_id, 128, req.image_b64)
         curve = timing_curve(to_gray(image))
         return {"source": source, "timing": curve}
 
@@ -117,12 +134,12 @@ async def timing(req: VerifyRequest):
 
 @router.post("/api/m3/verify")
 async def verify(req: VerifyRequest):
-    key = req.image_id or "demo"
-    if key in _verify_cache:
+    key = None if req.image_b64 else (req.image_id or "demo")
+    if key is not None and key in _verify_cache:
         return _verify_cache[key]
 
     def work():
-        image, source, _scale = _load(req.image_id, 160)
+        image, source, _scale = _load(req.image_id, 160, req.image_b64)
         report = run_experiment(image, source)
         matching = [row for row in report["rows"] if row["expected_match"]]
         worst = max(matching, key=lambda row: row["max_abs"])
@@ -131,7 +148,8 @@ async def verify(req: VerifyRequest):
         return report
 
     report = await run_in_threadpool(work)
-    _verify_cache[key] = report
+    if key is not None:
+        _verify_cache[key] = report
     return report
 
 

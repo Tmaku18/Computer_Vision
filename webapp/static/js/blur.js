@@ -4,7 +4,24 @@ import { api, setMsg } from "./api.js";
 
 const $ = (id) => document.getElementById(id);
 let imageId = null;
+let imageB64 = null;
 let chart = null;
+
+async function shrinkJpeg(file, maxSide = 1200, quality = 0.85) {
+  const bitmap = await createImageBitmap(file);
+  const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+  canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+  canvas.getContext("2d").drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  const blob = await new Promise((resolve, reject) => {
+    canvas.toBlob((result) => (result ? resolve(result) : reject(new Error("Could not encode JPEG"))), "image/jpeg", quality);
+  });
+  const bytes = new Uint8Array(await blob.arrayBuffer());
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  return { b64: btoa(binary), width: canvas.width, height: canvas.height };
+}
 
 function kernelFields() {
   const name = $("kernel").value;
@@ -26,16 +43,15 @@ $("photo").addEventListener("change", () => {
 });
 
 async function upload(file) {
-  setMsg($("msg"), `Uploading ${file.name}…`);
+  setMsg($("msg"), `Reading ${file.name}…`);
   try {
-    const body = new FormData();
-    body.append("file", file);
-    const meta = await api("/api/images", { form: body });
-    imageId = meta.id;
-    $("photo-name").textContent = `${meta.name} · ${meta.width} × ${meta.height}`;
-    setMsg($("msg"), "Uploaded. Press Blur both ways.", "ok");
+    const prepared = await shrinkJpeg(file);
+    imageId = null;
+    imageB64 = prepared.b64;
+    $("photo-name").textContent = `${file.name} · ${prepared.width} × ${prepared.height}`;
+    setMsg($("msg"), "Photo ready. Press Blur both ways.", "ok");
   } catch (err) {
-    setMsg($("msg"), err.message, "error");
+    setMsg($("msg"), err.message || "Could not read that photo. Export it as a JPEG.", "error");
   }
 }
 
@@ -71,6 +87,7 @@ $("btn-blur").addEventListener("click", async () => {
     const body = await api("/api/m3/blur", {
       json: {
         image_id: imageId,
+        image_b64: imageB64,
         kernel: $("kernel").value,
         size: Number($("size").value),
         sigma: Number($("sigma").value),
@@ -88,7 +105,7 @@ $("btn-blur").addEventListener("click", async () => {
     show("img-kernel", body.kernel_url);
     metricsHtml(body);
     setMsg($("msg"), "Done. Loading the timing comparison…", "ok");
-    const curve = await api("/api/m3/timing", { json: { image_id: imageId } });
+    const curve = await api("/api/m3/timing", { json: { image_id: imageId, image_b64: imageB64 } });
     drawTiming(curve.timing);
     setMsg($("msg"), "Done.", "ok");
   } catch (err) {
