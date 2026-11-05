@@ -68,12 +68,14 @@
         </table>
       </div>
       <div class="row" style="margin-top:0.75rem">
+        <button type="button" class="secondary" id="btn-apply-distance">Apply camera distance to these rows</button>
         <button type="button" class="secondary" id="btn-export-csv">Export CSV</button>
         <button type="button" class="secondary" id="btn-export-json">Export JSON</button>
         <label class="button secondary" style="margin:0">Import<input type="file" id="import-file" accept=".csv,.json" hidden></label>
         <div class="spacer"></div>
         <button type="button" class="danger" id="btn-clear-rows">Delete all</button>
       </div>
+      <p class="hint">If the pinhole column is blank, upload the same photo, type the camera distance, and press the button above. The clicks and tape lengths stay as they are.</p>
     </div>
   </div>
 
@@ -97,5 +99,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script type="module" src="/static/js/validation.js"></script>
+<script type="module" src="/static/js/validation.js?v=2"></script>
 {% endblock %}

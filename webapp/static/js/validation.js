@@ -1,6 +1,6 @@
 // Step 3 page: record 20 ground-truth comparisons and show error statistics.
 
-import { $, download, escapeHtml, fmt, setMsg, store } from "./api.js";
+import { $, api, download, escapeHtml, fmt, setMsg, store } from "./api.js";
 import { computeStats, csvToRows, drawCharts, rowsToCsv, statsHtml } from "./stats-view.js";
 import { Workspace } from "./workspace.js";
 
@@ -78,6 +78,8 @@ $("#btn-add").addEventListener("click", () => {
     v1: +current.pts[0][1].toFixed(2),
     u2: +current.pts[1][0].toFixed(2),
     v2: +current.pts[1][1].toFixed(2),
+    width_px: ws.image.width,
+    height_px: ws.image.height,
     camera_distance_m: dist ? +(dist.value * { mm: 0.001, cm: 0.01, m: 1, in: 0.0254, ft: 0.3048 }[dist.unit]).toFixed(4) : null,
     reference_kind: ws.reference ? ws.reference.kind : "none",
   });
@@ -131,6 +133,67 @@ async function refresh() {
   }
   drawCharts(rows, unit, $("#chart-scatter"), $("#chart-errors"));
 }
+
+const METERS = { mm: 0.001, cm: 0.01, m: 1, in: 0.0254, ft: 0.3048 };
+
+$("#btn-apply-distance").addEventListener("click", async () => {
+  const msg = $("#add-msg");
+  const dist = ws.distance;
+  const rows = store.rows;
+  if (!rows.length) {
+    setMsg(msg, "There are no saved measurements.", "error");
+    return;
+  }
+  if (!dist) {
+    setMsg(msg, "Enter the camera distance first.", "error");
+    return;
+  }
+  if (!ws.image) {
+    setMsg(msg, "Upload the same photo once. The saved points do not need to be clicked again.", "error");
+    return;
+  }
+  const named = rows.filter((r) => r.image);
+  const matches = named.filter((r) => r.image === ws.image.name);
+  const useLoadedSize = matches.length === named.length || matches.length === 0;
+  if (matches.length === 0 && !confirm(
+    `None of the saved rows are labeled ${ws.image.name}. Apply this photo’s size and the distance to all ${rows.length} rows?`,
+  )) {
+    return;
+  }
+  $("#btn-apply-distance").disabled = true;
+  let updated = 0;
+  try {
+    for (const row of rows) {
+      const samePhoto = !row.image || row.image === ws.image.name || useLoadedSize;
+      const width = row.width_px || (samePhoto ? ws.image.width : null);
+      const height = row.height_px || (samePhoto ? ws.image.height : null);
+      if (!width || !height || row.u1 == null || row.v1 == null || row.u2 == null || row.v2 == null) continue;
+      const res = await api("/api/measure", {
+        json: {
+          width_px: width,
+          height_px: height,
+          calibration_id: store.calibrationId,
+          points: [[row.u1, row.v1], [row.u2, row.v2]],
+          closed: false,
+          unit: row.unit,
+          distance: dist,
+        },
+      });
+      row.est_pinhole = res.pinhole.edge_lengths[0];
+      row.camera_distance_m = +(dist.value * METERS[dist.unit]).toFixed(4);
+      row.width_px = width;
+      row.height_px = height;
+      updated += 1;
+    }
+    store.rows = rows;
+    setMsg(msg, `Set the camera distance on ${updated} of ${rows.length} measurements.`, updated ? "ok" : "error");
+    refresh();
+  } catch (err) {
+    setMsg(msg, err.message, "error");
+  } finally {
+    $("#btn-apply-distance").disabled = false;
+  }
+});
 
 $("#btn-export-csv").addEventListener("click", () => download("validation_measurements_export.csv", rowsToCsv(store.rows), "text/csv"));
 $("#btn-export-json").addEventListener("click", () =>
